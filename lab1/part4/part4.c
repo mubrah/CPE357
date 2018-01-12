@@ -1,16 +1,15 @@
 #include <ctype.h>
 
+#include "part4.h"
+
 void str_lower(char string[], char buffer[]) {
-	int len = sizeof(string) / sizeof(string[0]);
-	for (int i; i < len; i++) {
+	for (int i = 0; string[i]; i++) {
 		buffer[i] = tolower(string[i]);
 	}
-	buffer
 }
 
 void str_lower_mutate(char string[]) {
-	int len = sizeof(string) / sizeof(string[0]);
-	for (int i; i < len; i++) {
+	for (int i = 0; string[i]; i++) {
 		string[i] = tolower(string[i]);
 	}
 }
