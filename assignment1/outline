@@ -1,0 +1,21 @@
+Justin Nguyen (jnguy265)
+2018-01-17
+CPE 257-03/04
+
+Assignment 1 Decomposition
+- Parse command line arguments 
+    - Unit test by echoing user input with specified arrays of strings
+- Verify command line arguments
+    - Unit test by echoing user input when fed string meets certain criteria
+- Simplify input 'sets' by reducing escape sequences into characters
+    - Unit test by echoing input set containing escaped sequences with
+      corrected characters  
+- Read and write input character by character
+    - Use getchar and putchar
+    - If translate mode, change input text with defined mapping
+    - If delete mode, remove characters in set
+    - Unit test by seeing if translate and delete subroutines work correctly
+      with varying sets and inputs  
+
+Integration Test: Feed program with varying correct and erroneous input and see
+that correct result is achieved 
