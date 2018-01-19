@@ -18,6 +18,36 @@ void deleteSubstring(char *string, int start, int length) {
     }
 } 
 
+void translateSubstring(char *string, int start, int srcLen, char dest[]) {
+    int i;
+    for (i=0; i < srcLen; i++) {
+        string[start + i] = dest[i];
+    }
+    if (dest[i++] != '\0') {
+        while (dest[i] != '\0') {
+            string[start + i]; 
+        }
+    }
+}
+
+void validateSets(char *src, char *dest, char *newDest) {
+    int lenSrc = strlen(src);
+    int lenDest = strlen(dest);
+
+    if (lenSrc > lenDest) {
+        int i;
+        for (i=0; src[i]; i++) {
+            if (i < lenDest) {
+                newDest[i] = dest[i];
+                printf("%c\n", newDest[i]);
+            } else {
+                newDest[i] = dest[lenDest - 1];
+                printf("%c\n", newDest[i]);
+            }
+        }
+        dest = newDest; 
+    }
+}
 
 void getString(char *inputBuffer) {
     int thisChar;
@@ -36,17 +66,18 @@ void delete(char set[]) {
 
     while (1) {
         char inputBuffer[MAXBUFFERSIZE];
+        int idx, substrIdx;
         getString(inputBuffer); 
 
         // Check for EOF and return 0 if so
 
         // Primitive substring search
         // TODO: Update this to something more efficient
-        for (int idx=0; inputBuffer[idx]; idx++) {
+        for (idx=0; inputBuffer[idx]; idx++) {
             if (inputBuffer[idx] == set[0] && idx < MAXBUFFERSIZE - strlen(set)) {
                 // Check that substring has a match starting at current index
                 int fullMatch = 1;
-                for (int substrIdx=0; set[substrIdx]; substrIdx++) {
+                for (substrIdx=0; set[substrIdx]; substrIdx++) {
                     if (inputBuffer[idx + substrIdx] != set[substrIdx]) {
                       fullMatch = 0;
                       break;
@@ -59,6 +90,14 @@ void delete(char set[]) {
         }
         printf("%s\n", inputBuffer);
     }
+}
+
+
+void translate(char src[], char dest[]) {
+    char newDest[strlen(src)];
+    printf("%s\n", dest);
+    validateTranslateSets(src, dest, newDest);
+    printf("%s\n", dest);
 }
 
 
@@ -99,8 +138,7 @@ int main(int argc, char *argv[]) {
     if (deleteMode) {
         delete(argv[2]);
     } else {
-        // translate();
-        return 255;
+        translate(argv[1], argv[2]);
     }
 
     return 0;
