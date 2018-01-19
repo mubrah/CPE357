@@ -1,47 +1,65 @@
 #include <stdio.h>
 #include <string.h>
 
-#define maxBufferSize 1000
+#define MAXBUFFERSIZE 500
 
 void delete(char set[]);
+void getString(char *inputBuffer);
+void deleteSubstring(char *string, int start, int length);
+
+
+void deleteSubstring(char *string, int start, int length) {
+    int i = start;
+    for (i; string[i+length]; i++) {
+        string[i] = string[i+length];
+    }
+    for (i; string[i]; i++) {
+        string[i] = '\0';
+    }
+} 
+
+
+void getString(char *inputBuffer) {
+    int thisChar;
+    int idx = 0;
+
+    while (thisChar != (int) '\n') {
+        thisChar = getchar();
+        inputBuffer[idx] = (char) thisChar;
+        idx++;
+    }
+    inputBuffer[idx-1] = '\0';
+}
+
 
 void delete(char set[]) {
-    char inputBuffer[maxBufferSize];
-    while (fgets(inputBuffer, maxBufferSize, stdin)) {
-        
+
+    while (1) {
+        char inputBuffer[MAXBUFFERSIZE];
+        getString(inputBuffer); 
+
+        // Check for EOF and return 0 if so
+
         // Primitive substring search
         // TODO: Update this to something more efficient
         for (int idx=0; inputBuffer[idx]; idx++) {
-            if (inputBuffer[idx] == set[0] && idx < maxBufferSize - strlen(set)) {
-                int match = 1;
-                for (int subStrIdx=0; set[subStrIdx]; subStrIdx++) {
-                    if (inputBuffer[idx + subStrIdx] != set[subStrIdx]) {
-                        match = 0;
-                        break;
+            if (inputBuffer[idx] == set[0] && idx < MAXBUFFERSIZE - strlen(set)) {
+                // Check that substring has a match starting at current index
+                int fullMatch = 1;
+                for (int substrIdx=0; set[substrIdx]; substrIdx++) {
+                    if (inputBuffer[idx + substrIdx] != set[substrIdx]) {
+                      fullMatch = 0;
+                      break;
                     }
                 }
-                if (match) {
-                    // Shift all elements in array forward by deleted string length
-                    int reIdx;
-                    for (reIdx=idx+1; inputBuffer[reIdx]; reIdx++) {
-                        int shiftNextIdx = reIdx + strlen(set);
-                        if (shiftNextIdx < maxBufferSize) {
-                            inputBuffer[reIdx] = inputBuffer[shiftNextIdx];
-                        } else {
-                            break;
-                        }
-                    }
-                    // Free remaining characters from string
-                    for (reIdx; inputBuffer[reIdx]; reIdx++) {
-                        inputBuffer[reIdx] = '\0';
-                    }
+                if (fullMatch) {
+                    deleteSubstring(inputBuffer, idx, strlen(set));
                 }
-            }
+            } 
         }
-        printf(inputBuffer);
+        printf("%s\n", inputBuffer);
     }
 }
-
 
 
 int main(int argc, char *argv[]) {
@@ -73,9 +91,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    
     // Main program logic
-    if (argv[1] == "-d") {
+    if (strcmp(argv[1], "-d") == 0) {
         deleteMode = 1;
     }
 
