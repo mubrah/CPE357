@@ -17,21 +17,24 @@ void translate(char *src, char *dest);
 void escapeChar(char *string) {
 	int i, j;
 	for (i=0; string[i]; i++) {
-		if (string[i] == '\\') {
+		if (string[i] == '\\' && string[i-1] != '\\') {
 			switch (string[i + 1]) {
 				case 't':
 					string[i] = '\t';
+                    for (j=i+1; string[j]; j++) {
+                        string[j] = string[j+1];
+                    }
 					break;
 				case 'n':
 					string[i] = '\n';
+                    for (j=i+1; string[j]; j++) {
+                        string[j] = string[j+1];
+                    }
 					break;
 				case '\\':
 					string[i] = '\\';
 					break;
 			}
-			for (j=i+1; string[j]; j++) {
-                string[j] = string[j+1];
-            }
 		}
 	}
 }
