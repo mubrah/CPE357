@@ -118,10 +118,11 @@ void translate(char *src, char *dest) {
 	// Update translation dest if len(set1) > len(set2)
 	// (ie) set1: abcd	set2: def	=> set2: deff
     if (lenSrc > lenDest) {
-		
+	    int i;
+
 		strcpy(fixedDest, dest);
 		fixedDest[lenSrc] = '\0';
-		for (int i=lenDest; i<lenSrc; i++) {
+		for (i=lenDest; i<lenSrc; i++) {
 			fixedDest[i] = dest[lenDest - 1];
 		}
 		strncpy(dest, fixedDest, lenSrc);
