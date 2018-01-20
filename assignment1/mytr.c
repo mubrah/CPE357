@@ -4,6 +4,7 @@
 
 #define MAXBUFFERSIZE 500
 
+
 void escapeChar(char *string);
 void getString(char *inputBuffer);
 int stringSearch(char *string, char *query, int *resultIdxs); 
@@ -28,7 +29,7 @@ void escapeChar(char *string) {
 					string[i] = '\\';
 					break;
 			}
-			for (j=i+1; string[i]; i++) {
+			for (j=i+1; string[j]; j++) {
 				string[j] = string[j+1];
 			}
 		}
@@ -59,8 +60,8 @@ int stringSearch(char *string, char *query, int *resultIdxs) {
 			int fullMatch = 1;
 			for (substrIdx=0; query[substrIdx]; substrIdx++) {
 				if (string[idx + substrIdx] != query[substrIdx]) {
-				  fullMatch = 0;
-				  break;
+					fullMatch = 0;
+					break;
 				}
 			}
 			if (fullMatch) {
