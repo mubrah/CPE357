@@ -111,7 +111,7 @@ void translate(char *src, char *dest) {
 		getString(inputBuffer);
 		int numMatches = stringSearch(inputBuffer, src, matchStartIdxs);
 		for (i=0; i<numMatches; i++) {
-			replaceSubstring(inputBuffer, dest, matchStartIdxs[i]-strlen(src)*i);
+			replaceSubstring(inputBuffer, dest, matchStartIdxs[i]);
 		}
         printf("%s\n", inputBuffer);
 	}
