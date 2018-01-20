@@ -1,13 +1,57 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define MAXBUFFERSIZE 500
 
-void delete(char *set);
 void getString(char *inputBuffer);
+void stringSearch(char *string, char *query, int *resultIdxs); 
 void deleteSubstring(char *string, int start, int length);
+void replaceSubstring(char *string, char *replacement, int start);
+void delete(char *set);
 void translate(char *src, char *dest);
 
+
+void getString(char *inputBuffer) {
+    int thisChar;
+    int idx = 0;
+
+    while (thisChar != (int) '\n') {
+        thisChar = getchar();
+        inputBuffer[idx] = (char) thisChar;
+        idx++;
+    }
+    inputBuffer[idx-1] = '\0';
+}
+
+void stringSearch(char *string, char *query, int *resultIdxs) {
+	int maxSearchMatches = strlen(string) % strlen(query);
+	int matchStartIdxs[maxSearchMatches];
+	int matchIdx = 0;
+	int idx, substrIdx, i;
+	 
+	// Primitive substring search
+	// TODO: Update this to something more efficient
+	for (idx=0; string[idx]; idx++) {
+		if (string[idx] == query[0] && idx < MAXBUFFERSIZE - strlen(query)) {
+			// Check that substring has a match starting at current index
+			int fullMatch = 1;
+			for (substrIdx=0; query[substrIdx]; substrIdx++) {
+				if (string[idx + substrIdx] != query[substrIdx]) {
+				  fullMatch = 0;
+				  break;
+				}
+			}
+			if (fullMatch) {
+				matchStartIdxs[matchIdx] = idx;
+				matchIdx++;
+			}
+		}
+	}
+	for (i=0; i<maxSearchMatches; i++) {
+		resultIdxs[i] = matchStartIdxs[i];
+	}
+}
 
 void deleteSubstring(char *string, int start, int length) {
     int i = start;
@@ -26,45 +70,22 @@ void replaceSubstring(char *string, char *replacement, int start) {
 	}
 }
 
-void getString(char *inputBuffer) {
-    int thisChar;
-    int idx = 0;
-
-    while (thisChar != (int) '\n') {
-        thisChar = getchar();
-        inputBuffer[idx] = (char) thisChar;
-        idx++;
-    }
-    inputBuffer[idx-1] = '\0';
-}
-
-
 void delete(char *set) {
 
     while (1) {
         char inputBuffer[MAXBUFFERSIZE];
-        int idx, substrIdx;
+        int idx, substrIdx, i;
+		int matchStartIdxs[strlen(inputBuffer) * strlen(set)];
         getString(inputBuffer); 
-
+		stringSearch(inputBuffer, set, matchStartIdxs);
+		
         // Check for EOF and return 0 if so
+		
+		for (i=0; matchStartIdxs[i]; i++) {
+			deleteSubstring(inputBuffer, matchStartIdxs[i], strlen(set));
+		}
 
-        // Primitive substring search
-        // TODO: Update this to something more efficient
-        for (idx=0; inputBuffer[idx]; idx++) {
-            if (inputBuffer[idx] == set[0] && idx < MAXBUFFERSIZE - strlen(set)) {
-                // Check that substring has a match starting at current index
-                int fullMatch = 1;
-                for (substrIdx=0; set[substrIdx]; substrIdx++) {
-                    if (inputBuffer[idx + substrIdx] != set[substrIdx]) {
-                      fullMatch = 0;
-                      break;
-                    }
-                }
-                if (fullMatch) {
-                    deleteSubstring(inputBuffer, idx, strlen(set));
-                }
-            } 
-        }
+	
         printf("%s\n", inputBuffer);
     }
 }
