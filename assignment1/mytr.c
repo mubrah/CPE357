@@ -4,6 +4,7 @@
 
 #define MAXBUFFERSIZE 500
 
+void escapeChar(char *string);
 void getString(char *inputBuffer);
 int stringSearch(char *string, char *query, int *resultIdxs); 
 void deleteSubstring(char *string, int length, int start);
@@ -11,6 +12,28 @@ void replaceSubstring(char *string, char *replacement, int start);
 void delete(char *set);
 void translate(char *src, char *dest);
 
+
+void escapeChar(char *string) {
+	int i, j;
+	for (i=0; string[i]; i++) {
+		if (string[i] == '\\') {
+			switch (string[i + 1]) {
+				case 't':
+					string[i] = '\t';
+					break;
+				case 'n':
+					string[i] = '\n';
+					break;
+				case '\\':
+					string[i] = '\\';
+					break;
+			}
+			for (j=i+1; string[i]; i++) {
+				string[j] = string[j+1];
+			}
+		}
+	}
+}
 
 void getString(char *inputBuffer) {
     int thisChar;
@@ -91,7 +114,8 @@ void translate(char *src, char *dest) {
 	int lenDest = strlen(dest);
 	char fixedDest[lenSrc + 1];
 	
-	// Update destination translation to use
+	// Update translation dest if len(set1) > len(set2)
+	// (ie) set1: abcd	set2: def	=> set2: deff
     if (lenSrc > lenDest) {
 		
 		strcpy(fixedDest, dest);
@@ -153,10 +177,14 @@ int main(int argc, char **argv) {
     }
 
     if (deleteMode) {
+        escapeChar(argv[2]);
         delete(argv[2]);
     } else {
-        translate(argv[1], argv[2]);
+		escapeChar(argv[1]);
+		escapeChar(argv[2]);
+		translate(argv[1], argv[2]);
     }
+
 
     return 0;
 }
