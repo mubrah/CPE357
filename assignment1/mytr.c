@@ -41,6 +41,9 @@ void getString(char *inputBuffer) {
     int idx = 0;
 
     while (thisChar != (int) '\n') {
+        if (thisChar == EOF) {
+            exit(0);
+        }
         thisChar = getchar();
         inputBuffer[idx] = (char) thisChar;
         idx++;
