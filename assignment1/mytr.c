@@ -3,9 +3,10 @@
 
 #define MAXBUFFERSIZE 500
 
-void delete(char set[]);
+void delete(char *set);
 void getString(char *inputBuffer);
 void deleteSubstring(char *string, int start, int length);
+void translate(char *src, char *dest);
 
 
 void deleteSubstring(char *string, int start, int length) {
@@ -16,37 +17,13 @@ void deleteSubstring(char *string, int start, int length) {
     for (i; string[i]; i++) {
         string[i] = '\0';
     }
-} 
-
-void translateSubstring(char *string, int start, int srcLen, char dest[]) {
-    int i;
-    for (i=0; i < srcLen; i++) {
-        string[start + i] = dest[i];
-    }
-    if (dest[i++] != '\0') {
-        while (dest[i] != '\0') {
-            string[start + i]; 
-        }
-    }
 }
 
-void validateSets(char *src, char *dest, char *newDest) {
-    int lenSrc = strlen(src);
-    int lenDest = strlen(dest);
-
-    if (lenSrc > lenDest) {
-        int i;
-        for (i=0; src[i]; i++) {
-            if (i < lenDest) {
-                newDest[i] = dest[i];
-                printf("%c\n", newDest[i]);
-            } else {
-                newDest[i] = dest[lenDest - 1];
-                printf("%c\n", newDest[i]);
-            }
-        }
-        dest = newDest; 
-    }
+void replaceSubstring(char *string, char *replacement, int start) {
+	int idx;
+	for (idx=0; replacement[idx]; idx++) {
+		string[start + idx] = replacement[idx];
+	}
 }
 
 void getString(char *inputBuffer) {
@@ -62,7 +39,7 @@ void getString(char *inputBuffer) {
 }
 
 
-void delete(char set[]) {
+void delete(char *set) {
 
     while (1) {
         char inputBuffer[MAXBUFFERSIZE];
@@ -93,15 +70,53 @@ void delete(char set[]) {
 }
 
 
-void translate(char src[], char dest[]) {
-    char newDest[strlen(src)];
-    printf("%s\n", dest);
-    validateTranslateSets(src, dest, newDest);
-    printf("%s\n", dest);
+void translate(char *src, char *dest) {	
+	int lenSrc = strlen(src);
+	int lenDest = strlen(dest);
+	char fixedDest[lenSrc + 1];
+	
+	// Update destination translation to use 
+    if (lenSrc > lenDest) {
+		
+		strcpy(fixedDest, dest);
+		fixedDest[lenSrc] = '\0';
+		for (int i=lenDest; i<lenSrc; i++) {
+			fixedDest[i] = dest[lenDest - 1];
+		}
+		strncpy(dest, fixedDest, lenSrc);
+		dest[lenSrc] = '\0';
+	}
+	
+	while (1) {
+		char inputBuffer[MAXBUFFERSIZE];
+		int idx, substrIdx;
+		getString(inputBuffer);
+		
+        // Check for EOF and return 0 if so
+
+        // Primitive substring search
+        // TODO: Update this to something more efficient
+        for (idx=0; inputBuffer[idx]; idx++) {
+            if (inputBuffer[idx] == src[0] && idx < MAXBUFFERSIZE - strlen(src)) {
+                // Check that substring has a match starting at current index
+                int fullMatch = 1;
+                for (substrIdx=0; src[substrIdx]; substrIdx++) {
+                    if (inputBuffer[idx + substrIdx] != src [substrIdx]) {
+                      fullMatch = 0;
+                      break;
+                    }
+                }
+                if (fullMatch) {
+					replaceSubstring(inputBuffer, dest, idx);
+                }
+            } 
+        }
+        printf("%s\n", inputBuffer);
+	}
 }
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
 
     int deleteMode = 0;
 
