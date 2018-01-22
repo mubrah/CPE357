@@ -34,6 +34,12 @@ void escapeChar(char *string) {
 				case '\\':
 					string[i] = '\\';
 					break;
+				default:
+					string[i] = string[i+1];
+                    for (j=i+1; string[j]; j++) {
+                        string[j] = string[j+1];
+                    }
+					break;
 			}
 		}
 	}
