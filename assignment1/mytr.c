@@ -57,7 +57,8 @@ void getString(char *inputBuffer) {
         inputBuffer[idx] = (char)thisChar;
         idx++;
     }
-    inputBuffer[idx - 1] = '\0';
+    inputBuffer[idx - 1] = '\n';
+    inputBuffer[idx] = '\0';
 }
 
 int getCharMapIdx(char checkMatch, char *query) {
@@ -94,7 +95,7 @@ void delete(char *set) {
 				idx--;
 			}
 		}
-        printf("%s\n", inputBuffer);
+        printf("%s", inputBuffer);
     }
 }
 
@@ -131,7 +132,7 @@ void translate(char *src, char *dest) {
 				inputBuffer[idx] = dest[substrMapIdx];
 			}
 		}
-        printf("%s\n", inputBuffer);
+        printf("%s", inputBuffer);
 	}
 }
 
