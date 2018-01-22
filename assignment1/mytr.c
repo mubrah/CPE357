@@ -7,7 +7,7 @@
 
 void escapeChar(char *string);
 void getString(char *inputBuffer);
-int stringSearch(char *string, char *query, int *resultIdxs); 
+int getCharMapIdx(char string, char *query); 
 void deleteSubstring(char *string, int length, int start);
 void replaceSubstring(char *string, char *replacement, int start);
 void delete(char *set);
@@ -17,7 +17,7 @@ void translate(char *src, char *dest);
 void escapeChar(char *string) {
 	int i, j;
 	for (i=0; string[i]; i++) {
-		if (string[i] == '\\' && string[i-1] != '\\') {
+		if (string[i] == '\\' && string[i - 1] != '\\') {
 			switch (string[i + 1]) {
 				case 't':
 					string[i] = '\t';
@@ -43,48 +43,31 @@ void getString(char *inputBuffer) {
     int thisChar;
     int idx = 0;
 
-    while (thisChar != (int) '\n') {
+    while (thisChar != (int)'\n') {
         if (thisChar == EOF) {
             exit(0);
         }
         thisChar = getchar();
-        inputBuffer[idx] = (char) thisChar;
+        inputBuffer[idx] = (char)thisChar;
         idx++;
     }
-    inputBuffer[idx-1] = '\0';
+    inputBuffer[idx - 1] = '\0';
 }
 
-int stringSearch(char *string, char *query, int *resultIdxs) {
-	int maxSearchMatches = strlen(string) % strlen(query);
-	int matchStartIdxs[maxSearchMatches];
-	int matchIdx = 0;
-	int idx, substrIdx, i;
-	 
-	/* TODO: Update this to something more efficient */
-	for (idx=0; string[idx]; idx++) {
-		if (string[idx] == query[0] && idx < MAXBUFFERSIZE - strlen(query)) {
-			int fullMatch = 1;
-			for (substrIdx=0; query[substrIdx]; substrIdx++) {
-				if (string[idx + substrIdx] != query[substrIdx]) {
-					fullMatch = 0;
-					break;
-				}
-			}
-			if (fullMatch) {
-				matchStartIdxs[matchIdx] = idx;
-				matchIdx++;
-			}
+int getCharMapIdx(char checkMatch, char *query) {
+	int idx;
+	int substrIdx = -1;
+	for (idx=0; query[idx]; idx++) {
+		if (checkMatch == query[idx]) {
+			substrIdx = idx;
 		}
 	}
-	for (i=0; i<matchIdx; i++) {
-		resultIdxs[i] = matchStartIdxs[i];
-	}
-	return matchIdx;			/* Returns the number of matches found */
+	return substrIdx;
 }
 
 void deleteSubstring(char *string, int length, int start) {
     int i = start;
-    for (i; string[i+length]; i++) {
+    for (i+1; string[i]; i++) {
         string[i] = string[i+length];
     }
     for (i; string[i]; i++) {
@@ -92,27 +75,18 @@ void deleteSubstring(char *string, int length, int start) {
     }
 }
 
-void replaceSubstring(char *string, char *replacement, int start) {
-	int idx;
-	for (idx=0; replacement[idx]; idx++) {
-		string[start + idx] = replacement[idx];
-	}
-}
-
 void delete(char *set) {
     while (1) {
         char inputBuffer[MAXBUFFERSIZE];
-        int idx, substrIdx, i;
-		int matchStartIdxs[strlen(inputBuffer) % strlen(set)];
+        int idx;
 		
-        getString(inputBuffer); 
-		int numMatches = stringSearch(inputBuffer, set, matchStartIdxs);
-		for (i=0; i<numMatches; i++) {
-			/* 
-			 * -strlen(set)*i required to correct for changing input string length since
-			 * matchStartIdxs continas match start indexss for the original string length. 
-			 */
-			deleteSubstring(inputBuffer, strlen(set), matchStartIdxs[i]-strlen(set)*i);
+        getString(inputBuffer);
+		for (idx=0; inputBuffer[idx]; idx++) {
+			int match = getCharMapIdx(inputBuffer[idx], set);
+			if (match != -1) {
+				deleteSubstring(inputBuffer, 1, idx);
+				idx--;
+			}
 		}
         printf("%s\n", inputBuffer);
     }
@@ -131,7 +105,6 @@ void translate(char *src, char *dest) {
 	    int i;
 
 		strcpy(fixedDest, dest);
-		fixedDest[lenSrc] = '\0';
 		for (i=lenDest; i<lenSrc; i++) {
 			fixedDest[i] = dest[lenDest - 1];
 		}
@@ -141,13 +114,16 @@ void translate(char *src, char *dest) {
 	
 	while (1) {
 		char inputBuffer[MAXBUFFERSIZE];
-		int idx, substrIdx, i;
-		int matchStartIdxs[strlen(inputBuffer) % strlen(src)];
+		int idx;
 		
 		getString(inputBuffer);
-		int numMatches = stringSearch(inputBuffer, src, matchStartIdxs);
-		for (i=0; i<numMatches; i++) {
-			replaceSubstring(inputBuffer, dest, matchStartIdxs[i]);
+		for (idx=0; inputBuffer[idx]; idx++) {
+			int substrMapIdx = getCharMapIdx(inputBuffer[idx], src);
+			if (substrMapIdx == -1) {
+				continue;
+			} else {
+				inputBuffer[idx] = dest[substrMapIdx];
+			}
 		}
         printf("%s\n", inputBuffer);
 	}
