@@ -60,7 +60,7 @@ int stringSearch(char *string, char *query, int *resultIdxs) {
 	int matchIdx = 0;
 	int idx, substrIdx, i;
 	 
-	// TODO: Update this to something more efficient
+	/* TODO: Update this to something more efficient */
 	for (idx=0; string[idx]; idx++) {
 		if (string[idx] == query[0] && idx < MAXBUFFERSIZE - strlen(query)) {
 			int fullMatch = 1;
@@ -79,7 +79,7 @@ int stringSearch(char *string, char *query, int *resultIdxs) {
 	for (i=0; i<matchIdx; i++) {
 		resultIdxs[i] = matchStartIdxs[i];
 	}
-	return matchIdx;			// Returns the number of matches found
+	return matchIdx;			/* Returns the number of matches found */
 }
 
 void deleteSubstring(char *string, int length, int start) {
@@ -108,8 +108,10 @@ void delete(char *set) {
         getString(inputBuffer); 
 		int numMatches = stringSearch(inputBuffer, set, matchStartIdxs);
 		for (i=0; i<numMatches; i++) {
-			// -strlen(set)*i required to correct for changing input string length since
-			// matchStartIdxs continas match start indexss for the original string length. 
+			/* 
+			 * -strlen(set)*i required to correct for changing input string length since
+			 * matchStartIdxs continas match start indexss for the original string length. 
+			 */
 			deleteSubstring(inputBuffer, strlen(set), matchStartIdxs[i]-strlen(set)*i);
 		}
         printf("%s\n", inputBuffer);
@@ -121,8 +123,10 @@ void translate(char *src, char *dest) {
 	int lenDest = strlen(dest);
 	char fixedDest[lenSrc + 1];
 	
-	// Update translation dest if len(set1) > len(set2)
-	// (ie) set1: abcd	set2: def	=> set2: deff
+	/*
+	 * Update translation dest if len(set1) > len(set2)
+	 * (ie) set1: abcd	set2: def	=> set2: deff
+	 */
     if (lenSrc > lenDest) {
 	    int i;
 
@@ -154,7 +158,7 @@ int main(int argc, char **argv) {
 
     int deleteMode = 0;
 
-    // Validate input arguments
+    /* Validate input arguments */
     if (argc == 1) {
         fprintf(stderr, "mytr: missing operand\n");
         fprintf(stderr, "Try 'mytr --help' for more information.\n");
@@ -179,7 +183,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Main program logic
+    /* Main program logic */
     if (strcmp(argv[1], "-d") == 0) {
         deleteMode = 1;
     }
