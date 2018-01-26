@@ -43,5 +43,6 @@ int main(int argc, char **argv) {
     
     FILE *file = fopen(argv[1], "r");
     read_long_line(file); 
+    fclose(file);
     return 0;
 }   
