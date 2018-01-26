@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void read_long_line(FILE *file) {
+void uniq(FILE *file) {
     int bufferLength = 256;
     int bufferIdx = 0;
     char *stringBuffer = (char *)malloc(bufferLength * sizeof(*stringBuffer));
@@ -42,7 +42,7 @@ void read_long_line(FILE *file) {
 int main(int argc, char **argv) {
     
     FILE *file = fopen(argv[1], "r");
-    read_long_line(file); 
+    uniq(file); 
     fclose(file);
     return 0;
 }   
