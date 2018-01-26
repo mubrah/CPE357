@@ -1,0 +1,43 @@
+Assignment 2 Decomposition
+Justin Nguyen
+CPE 357-03
+
+High Level Decomposition
+Problem: Write a program 'fw' that will return a sorted list of the n most
+common words in a file or set of files, sorted by order of frequency.
+
+1. Parse Command Line Arguments and Input Data
+    - Conditional structure to call correct subroutine based on cli arguments
+    - Common string parsing methods will be required to parse arguments
+    - Test: Echo back command line arguments
+
+2. Verify command-line arguments 
+    - Route input data to correct subroutine based on arguments
+    - Return error if faulty argument is supplied
+    - Test: Echo back parsed command line arguments and "intented" subroutine
+    - Test: Test with faulty arguments and verify graceful failure and correct
+      return codes
+
+3. Read in input data
+    - Ingest input words supplied in file
+    - Test: Echo back all words in file with correct definition of a 'word'
+
+4. Store input data
+    - Use hashmap to store strings in heap
+    - Use fixed array list to store pointers to hashes of input strings in
+      a struct with additional parameter (ie) count
+    - Test: Verify that data can be stored and retrieved from the data
+      structure
+
+5. Get frequency
+    - Iterate through array list calculate frequency of words and add to
+      word struct
+    - Test: Verify that method can correctly calculate the frequency of words
+      on a variety of different list containing a variety of structs
+
+6. Sort Array List
+    - Sort array list by frequency which is an attr of each struct in the array
+    - Will use quick sort
+    - Test: Verify that sorting algorithm correctly sorts array following
+      natural ordering defined in the algorithm. Use many edge cases of input
+      arrays to test reliability
