@@ -24,7 +24,7 @@ struct hashTable *makeHashTable(void) {
         // Handle Null
     }
 
-    table->capacity = 129;      // 2^15 - 1 = 32767
+    table->capacity = 32767;      // 2^15 - 1 = 32767
     table->count = 0;
     if ((buckets = (struct chain **)malloc((table->capacity) * sizeof(struct chain *))) == NULL) {
         printf("Poop\n");
