@@ -30,9 +30,12 @@ int main(int argc, char **argv) {
         }
     }
 
+
+
     struct hashTable *table = makeHashTable(); 
     FILE *file = NULL;
-    for (idx = 0; idx <= fnIdx; idx++) {
+    for (idx = 0; idx < fnIdx; idx++) {
+        printf("%s\n", argv[filenameIdxs[idx]]);
         file = fopen(argv[filenameIdxs[idx]], "r");
         countWords(file, table);
         fclose(file);
