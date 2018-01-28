@@ -4,11 +4,11 @@ int cmpWordCount(const void *_wc1, const void *_wc2) {
     struct wordCount *wc1 = _wc1;
     struct wordCount *wc2 = _wc2;
     return wc2->count - wc1->count;
-    if (wc1->count == wc2->count) {
-        return -1;
-    } else {
-        return wc2->count - wc1->count;
-    }
+    // if (wc1->count == wc2->count) {
+    //     return -1;
+    // } else {
+    //     return wc2->count - wc1->count;
+    // }
 }
 
 int main(int argc, char **argv) {
@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
     }
 
     int minWords = table->uniqCount < numWords ? table->uniqCount : numWords;
-    printf("The top %i words (out of %i) are:\n", numWords, minWords);
-    qsort(words, table->uniqCount, sizeof(struct wordCount), cmpWordCount);
+    printf("The top %i words (out of %i) are:\n", minWords, minWords < numWords ? minWords : table->uniqCount);
+    qsort(words, table->uniqCount, sizeof(struct wordCount *), cmpWordCount);
     for (idx = 0; idx < minWords; idx++) {
         printf("\t%i %s\n", words[idx]->count, words[idx]->string);
     }

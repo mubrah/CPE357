@@ -42,15 +42,17 @@ void countWords(FILE *file, struct hashTable *table) {
                 stringBuffer++;
                 bufferSize++;
             } else {
-                int i;
+                if (bufferSize > 0) {
+                    int i;
 
-                *stringBuffer = '\0';
-                stringBuffer -= bufferSize;
-                insertHashTable(table, stringBuffer);
-                for (i = 0; stringBuffer[i]; i++) {
-                    stringBuffer[i] = '\0';
+                    *stringBuffer = '\0';
+                    stringBuffer -= bufferSize;
+                    insertHashTable(table, stringBuffer);
+                    for (i = 0; stringBuffer[i]; i++) {
+                        stringBuffer[i] = '\0';
+                    }
+                    bufferSize = 0;
                 }
-                bufferSize = 0;
             } 
         }
     }
