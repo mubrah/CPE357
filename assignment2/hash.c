@@ -67,7 +67,7 @@ int chainContains(struct chain *toSearch, char *string) {
     }
 }
 
-struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount) {
+struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount, int hash) {
     if (existingChain == NULL) {
         struct chain *newChain;
         struct wordCount *newWord;
@@ -80,11 +80,12 @@ struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount) 
         newWord = buildWord(word);
         newChain->word = newWord;
         newChain->next = NULL;
-        uniqCount += 1;
+        newChain->hash = hash;
+        *uniqCount += 1;
         return newChain;
     } else {
         if (!chainContains(existingChain, word)) {
-            existingChain->next = addChain(existingChain->next, word, uniqCount);
+            existingChain->next = addChain(existingChain->next, word, uniqCount, hash);
         }
         return existingChain;
     }
@@ -97,5 +98,5 @@ void insertHashTable(struct hashTable *table, char *word) {
 
     unsigned int hash = hashString(word);
     int offset = hash % (table->capacity);
-    table->buckets[offset] = addChain(table->buckets[offset], word, &(table->count));
+    table->buckets[offset] = addChain(table->buckets[offset], word, &(table->uniqCount), offset);
 }

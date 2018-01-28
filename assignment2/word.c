@@ -37,7 +37,7 @@ void countWords(FILE *file, struct hashTable *table) {
                 stringBuffer += bufferSize;
             }
 
-            if (isalpha(c) || isdigit(c)) {
+            if (isalpha(c) && c != '\0') {
                 *stringBuffer = c;
                 stringBuffer++;
                 bufferSize++;
