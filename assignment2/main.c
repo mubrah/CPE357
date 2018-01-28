@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
         if (argv[idx][0] == '-') {
             switch (argv[idx][1]) {
                 case 'n':
-                    if (isdigit(argv[idx + 1])) {
-                        numWords = *(argv[idx + 1]);
+                    if (isdigit(*argv[idx + 1])) {
+                        numWords = *argv[idx + 1] - '0';
                         idx++;
                     } else {
                         fprintf(stderr, "usage: fw [-n num] [ file1 [ file 2 ...] ]");
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
     printf("The top %i words (out of %i) are:\n", minWords, minWords < numWords ? minWords : table->uniqCount);
     qsort(words, table->uniqCount, sizeof(struct wordCount *), cmpWordCount);
     for (idx = 0; idx < minWords; idx++) {
-        printf("\t%i %s\n", words[idx]->count, words[idx]->string);
+        printf("%10d %s\n", words[idx]->count, words[idx]->string);
     }
     
 
