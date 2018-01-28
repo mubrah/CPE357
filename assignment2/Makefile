@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g # -ansi -pedantic 
+CFLAGS = -Wall -g -ansi -pedantic 
 SOURCES = main.c hash.c word.c
 OBJECTS = main.o hash.o word.o
 .PHONY: clean

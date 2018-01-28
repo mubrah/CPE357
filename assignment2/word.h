@@ -22,4 +22,4 @@ struct wordCount *buildWord(char *str);
 void freeWordCount(struct wordCount *word);
 void countWords(FILE *file, struct hashTable *table);
 
-#endif  // WORD_H
+#endif  /* WORD_H */

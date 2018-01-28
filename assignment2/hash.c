@@ -1,7 +1,7 @@
 #include "hash.h"
 
 
-// Using Jenkin's One-At-A-Time Hashing
+/* Using Jenkin's One-At-A-Time Hashing */
 int hashString(char *str) {
     int hash, i;
 
@@ -21,26 +21,24 @@ struct hashTable *makeHashTable(void) {
     struct chain **buckets;
 
     if ((table = (struct hashTable *)malloc(sizeof(*table))) == NULL) {
-        // Handle Null
+        /* Handle failure to allocate memory */
     }
 
-    table->capacity = 32767;      // 2^15 - 1 = 32767
+    table->capacity = 32767;      /* 2^15 - 1 = 32767 */
     table->count = 0;
     if ((buckets = (struct chain **)malloc((table->capacity) * sizeof(struct chain *))) == NULL) {
-        printf("Poop\n");
+        /* Handle failure to allocate memory */
     }
     table->buckets = buckets;
     return table;
 }
 
 void freeChain(struct chain *link) {
-    if (link == NULL) {
-        return;
-    } else {
+    if (link != NULL) {
         struct chain *next = link->next;
         freeWordCount(link->word);
         free(link);
-        return freeChain(next);
+        freeChain(next);
     }
 }
 
@@ -55,7 +53,7 @@ void destroyHashTable(struct hashTable *table) {
     free(table);
 }
 
-// This will also incremnt the count for a wordCount if a match is found
+/* This will also increment the count for a wordCount if a match is found */
 int chainContains(struct chain *toSearch, char *string) {
     if (toSearch == NULL) {
         return 0;
@@ -72,10 +70,10 @@ struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount, 
         struct chain *newChain;
         struct wordCount *newWord;
         if ((newChain = (struct chain *)malloc(sizeof(*newChain))) == NULL) {
-            // Handle Null
+            /* Handle failure to allocate memory */
         }
         if ((newWord = (struct wordCount*)malloc(sizeof(*newWord))) == NULL) {
-            // Handle Null
+            /* Handle failure to allocate memory */
         }
         newWord = buildWord(word);
         newChain->word = newWord;
@@ -92,11 +90,13 @@ struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount, 
 }
 
 void insertHashTable(struct hashTable *table, char *word) {    
+    unsigned int hash;
+    int offset;
     if (table->count / table->capacity > 0.75) {
-        // Rehash
+        /* Rehash */
     }
 
-    unsigned int hash = hashString(word);
-    int offset = hash % (table->capacity);
+    hash = hashString(word);
+    offset = hash % (table->capacity);
     table->buckets[offset] = addChain(table->buckets[offset], word, &(table->uniqCount), offset);
 }

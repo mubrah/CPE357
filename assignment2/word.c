@@ -1,9 +1,15 @@
 #include "word.h"
 
-struct wordCount *buildWord(char *str) {     // Static?
-    struct wordCount *newWord = (struct wordCount *)malloc(sizeof(*newWord));
-    char *test = (char *)malloc(sizeof(*str) * (strlen(str) + 1));
-    newWord->string = test;
+struct wordCount *buildWord(char *str) {
+    struct wordCount *newWord;
+    if ((newWord = (struct wordCount *)malloc(sizeof(*newWord))) == NULL) {
+        /* Handle failure to allocate memory */
+    }
+    char *_str;
+    if ((_str = (char *)malloc(sizeof(*str) * (strlen(str) + 1))) == NULL) {
+        /* Handle failure to allocate memory */
+    }
+    newWord->string = _str;
     strcpy(newWord->string, str);
     newWord->count = 1;
     return newWord;
@@ -20,7 +26,7 @@ void countWords(FILE *file, struct hashTable *table) {
     int bufferSize = 0;
 
     if ((stringBuffer = (char *)malloc(bufferLength * sizeof(*stringBuffer))) == NULL) {
-        // Do somehing
+        /* Handle failure to allocate memory */
     }
 
     while (1) {
@@ -30,9 +36,8 @@ void countWords(FILE *file, struct hashTable *table) {
         } else {
             if (bufferSize == bufferLength) {
                 bufferLength *= 2;
-                if ((stringBuffer = (char *)realloc(stringBuffer-bufferSize, bufferLength))
-                        == NULL) {
-                    // Do something
+                if ((stringBuffer = (char *)realloc(stringBuffer-bufferSize, bufferLength)) == NULL) {
+                    /* Handle failure to allocate memory */
                 }
                 stringBuffer += bufferSize;
             }

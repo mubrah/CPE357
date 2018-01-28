@@ -27,9 +27,10 @@ struct chain {
 
 int hashString(char *str);
 struct hashTable *makeHashTable(void);
+void freeChain(struct chain *link);
 void destroyHashTable(struct hashTable *table);
 int chainContains(struct chain *toSearch, char *string);
 struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount, int hash);
 void insertHashTable(struct hashTable *table, char *word);
 
-#endif  // HASH_H
+#endif  /* HASH_H */
