@@ -33,8 +33,24 @@ struct hashTable *makeHashTable(void) {
     return table;
 }
 
+void freeChain(struct chain *link) {
+    if (link == NULL) {
+        return;
+    } else {
+        struct chain *next = link->next;
+        freeWordCount(link->word);
+        free(link);
+        return freeChain(next);
+    }
+}
+
 void destroyHashTable(struct hashTable *table) {
-    // Need method to recursivly free all chains in buckets
+    int i;
+    for (i=0; i < table->capacity; i++) {
+        if (table->buckets[i] != NULL) {
+            freeChain(table->buckets[i]);
+        }
+    }
     free(table->buckets);
     free(table);
 }

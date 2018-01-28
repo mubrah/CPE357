@@ -67,6 +67,8 @@ int main(int argc, char **argv) {
         }
     }
 
+    destroyHashTable(table);
+
 
     return 0;
 }
