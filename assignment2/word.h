@@ -12,10 +12,9 @@
 struct wordCount {
     char *string;
     int count;
-};
+} wordCount;
 
-static struct wordCount buildWord(char *str);
-void getWords(char *fileNamet, int **hashList);
+struct wordCount *buildWord(char *str);
 void freeWordCount(struct wordCount *word);
 
 #endif  // WORD_H
