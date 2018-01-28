@@ -1,14 +1,13 @@
 #include "main.h"
 
 int cmpWordCount(const void *_wc1, const void *_wc2) {
-    struct wordCount *wc1 = _wc1;
-    struct wordCount *wc2 = _wc2;
-    return wc2->count - wc1->count;
-    // if (wc1->count == wc2->count) {
-    //     return -1;
-    // } else {
-    //     return wc2->count - wc1->count;
-    // }
+    struct wordCount *wc1 = *(const struct wordCount **)_wc1;
+    struct wordCount *wc2 = *(const struct wordCount **)_wc2;
+    if (wc1->count == wc2->count) {
+        return strcmp(wc1->string, wc2->string);
+    } else {
+        return wc2->count - wc1->count;
+    }
 }
 
 int main(int argc, char **argv) {
