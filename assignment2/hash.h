@@ -27,7 +27,7 @@ int hashString(char *str);
 struct hashTable *makeHashTable(void);
 void destroyHashTable(struct hashTable *table);
 int chainContains(struct chain *toSearch, char *string);
-struct chain *addChain(struct chain *existingChain, struct wordCount *newWord, int *uniqCount);
-void insertHashTable(struct hashTable *table, struct wordCount *word);
+struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount);
+void insertHashTable(struct hashTable *table, char *word);
 
 #endif  // HASH_H
