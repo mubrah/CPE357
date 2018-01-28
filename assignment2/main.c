@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
             switch (argv[idx][1]) {
                 case 'n':
                     if (isdigit(*argv[idx + 1])) {
-                        numWords = *argv[idx + 1] - '0';
+                        numWords = strtol(argv[idx + 1], NULL, 10);
                         idx++;
                     } else {
                         fprintf(stderr, "usage: fw [-n num] [ file1 [ file 2 ...] ]");
