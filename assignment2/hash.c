@@ -77,7 +77,8 @@ struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount) 
         if ((newWord = (struct wordCount*)malloc(sizeof(*newWord))) == NULL) {
             // Handle Null
         }
-        newChain->word = word;
+        newWord = buildWord(word);
+        newChain->word = newWord;
         newChain->next = NULL;
         uniqCount += 1;
         return newChain;
