@@ -12,7 +12,7 @@
 struct wordCount {
     char *string;
     int count;
-} wordCount;
+};
 
 struct wordCount *buildWord(char *str);
 void freeWordCount(struct wordCount *word);

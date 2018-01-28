@@ -51,5 +51,22 @@ int main(int argc, char **argv) {
     free(stringBuffer);
     fclose(file);
     
+
+
+
+    int i;
+    for (i=0; i < table->capacity; i++) {
+        if (table->buckets[i] != NULL) {
+            struct chain *_buckets = table->buckets[i];
+            int j = 0;
+            while (_buckets != NULL) {
+                printf("[%i][%i]: %s | %i\n", i, j, _buckets->word->string, _buckets->word->count);
+                _buckets = _buckets->next;
+                j++;
+            }
+        }
+    }
+
+
     return 0;
 }

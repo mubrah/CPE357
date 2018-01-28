@@ -24,7 +24,7 @@ struct hashTable *makeHashTable(void) {
         // Handle Null
     }
 
-    table->capacity = 7;      // 2^15 - 1 = 32767
+    table->capacity = 129;      // 2^15 - 1 = 32767
     table->count = 0;
     if ((buckets = (struct chain **)malloc((table->capacity) * sizeof(struct chain *))) == NULL) {
         printf("Poop\n");
@@ -51,7 +51,7 @@ int chainContains(struct chain *toSearch, char *string) {
     }
 }
 
-struct chain *addChain(struct chain *existingChain, struct wordCount *newWord) {
+struct chain *addChain(struct chain *existingChain, struct wordCount *newWord, int *uniqCount) {
     if (existingChain == NULL) {
         struct chain *newChain;
         if ((newChain = (struct chain *)malloc(sizeof(*newChain))) == NULL) {
@@ -59,10 +59,11 @@ struct chain *addChain(struct chain *existingChain, struct wordCount *newWord) {
         }
         newChain->word = newWord;
         newChain->next = NULL;
+        uniqCount += 1;
         return newChain;
     } else {
         if (!chainContains(existingChain, newWord->string)) {
-            existingChain->next = addChain(existingChain->next, newWord);
+            existingChain->next = addChain(existingChain->next, newWord, uniqCount);
         }
         return existingChain;
     }
@@ -75,6 +76,5 @@ void insertHashTable(struct hashTable *table, struct wordCount *word) {
 
     unsigned int hash = hashString(word->string);
     int offset = hash % (table->capacity);
-    table->buckets[offset] = addChain(table->buckets[offset], word);
-    struct chain *test = table->buckets[offset];
+    table->buckets[offset] = addChain(table->buckets[offset], word, &(table->count));
 }

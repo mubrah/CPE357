@@ -16,18 +16,18 @@ struct hashTable {
     int capacity;
     int count;
     struct chain **buckets;
-} hashTable;
+};
 
 struct chain {
     struct wordCount *word;
     struct chain *next;
-} chain;
+};
 
 int hashString(char *str);
 struct hashTable *makeHashTable(void);
 void destroyHashTable(struct hashTable *table);
 int chainContains(struct chain *toSearch, char *string);
-struct chain *addChain(struct chain *existingChain, struct wordCount *newWord);
+struct chain *addChain(struct chain *existingChain, struct wordCount *newWord, int *uniqCount);
 void insertHashTable(struct hashTable *table, struct wordCount *word);
 
 #endif  // HASH_H
