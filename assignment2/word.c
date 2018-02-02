@@ -20,7 +20,7 @@ void freeWordCount(struct wordCount *word) {
     free(word);
 }
 
-void countWords(FILE *file, struct hashTable *table) {
+struct hashTable *countWords(FILE *file, struct hashTable *table) {
     char *stringBuffer;
     int bufferLength = 256;
     int bufferSize = 0;
@@ -52,7 +52,7 @@ void countWords(FILE *file, struct hashTable *table) {
 
                     *stringBuffer = '\0';
                     stringBuffer -= bufferSize;
-                    insertHashTable(table, stringBuffer);
+                    table = insertHashTable(table, stringBuffer);
                     for (i = 0; stringBuffer[i]; i++) {
                         stringBuffer[i] = '\0';
                     }
@@ -62,4 +62,5 @@ void countWords(FILE *file, struct hashTable *table) {
         }
     }
     free(stringBuffer);
+    return table;
 }

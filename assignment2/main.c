@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
             fprintf(stderr, "%s: No such file or directory", argv[filenameIdxs[idx]]);
             return 1;
         }
-        countWords(file, table);
+        table = countWords(file, table);
         fclose(file);
     }
 
