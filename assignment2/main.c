@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
                         numWords = strtol(argv[idx + 1], NULL, 10);
                         idx++;
                     } else {
-                        fprintf(stderr, "usage: fw [-n num] [ file1 [ file 2 ...] ]");
+                        fprintf(stderr, "usage: fw [-n num] [ file1 [ file 2 ...] ]\n");
                         return 1;
                     }
                     break;
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
                     debugMode = 1;
                     break;
                 default:
-                    fprintf(stderr, "fw: Invalid options given");
+                    fprintf(stderr, "fw: Invalid options given\n");
                     return 1;
                     break;
             }
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
     FILE *file = NULL;
     for (idx = 0; idx < fnIdx; idx++) {
         if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
-            fprintf(stderr, "%s: No such file or directory", argv[filenameIdxs[idx]]);
+            fprintf(stderr, "%s: No such file or directory\n", argv[filenameIdxs[idx]]);
             return 1;
         }
         table = countWords(file, table);
