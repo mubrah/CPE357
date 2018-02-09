@@ -66,6 +66,7 @@ int main(int argc, char **argv) {
 
     FILE *file = fopen(argv[1], "r");
     fileStr = fileToStr(file);
+    fclose(file);
     charFreqTable = countChars(fileStr);
     free(fileStr);
     HTree = createHTree(charFreqTable);
@@ -81,5 +82,6 @@ int main(int argc, char **argv) {
     }
 
     freeNode(HTree);
+    free(finalCodes);
     return 0;
 }
