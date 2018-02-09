@@ -1,8 +1,5 @@
 #include "words.h"
 
-#define NUMCHAR 128     /* 128 characters in ASCII */
-
-
 char *fileToStr(FILE *file) {
     char *stringBuffer = NULL;
     char *_stringBuffer = NULL;
@@ -34,7 +31,7 @@ char *fileToStr(FILE *file) {
             bufferSize++;
         }
     }
-    return stringBuffer;        /* TODO: Free buffer */
+    return stringBuffer;        /* MUST Free buffer */
 }
 
 int *countChars(char *string) {
@@ -57,7 +54,50 @@ int *countChars(char *string) {
         charFreq[(int)string[i]]++;
     }
     charFreq[NUMCHAR] = uniqChar;
-    return charFreq;
+    return charFreq;            /* MUST Free table */
+}
+
+void sortHNodeFreq(struct node **nodeStack, int stackSize) {
+    int i = 1;
+    int j = 0;
+
+    while (i < stackSize) {
+        j = i;
+        while (j > 0) {
+            if (nodeStack[j - 1]->freq > nodeStack[j]->freq) {
+                struct node *temp = nodeStack[j - 1];
+                nodeStack[j - 1] = nodeStack[j];
+                nodeStack[j] = temp;
+            }
+            if (nodeStack[j - 1]->freq == nodeStack[j]->freq) {
+                if (nodeStack[j - 1]->string[0] > nodeStack[j]->string[0]) {
+                    struct node *temp = nodeStack[j - 1];
+                    nodeStack[j - 1] = nodeStack[j];
+                    nodeStack[j] = temp;
+                }
+            }
+            j--;
+        }
+        i++;
+    }
+}
+
+void sortHNodeChar(struct node **nodeList, int stackSize) {
+    int i = 1;
+    int j = 0;
+
+    while (i < stackSize) {
+        j = i;
+        while (j > 0) {
+            if (nodeList[j - 1]->string[0] > nodeList[j]->string[0]) {
+                struct node *temp = nodeList[j - 1];
+                nodeList[j - 1] = nodeList[j];
+                nodeList[j] = temp;
+            }
+            j--;
+        }
+        i++;
+    }
 }
 
 struct node **createHNodeStack(int *charFreq) {
@@ -82,14 +122,12 @@ struct node **createHNodeStack(int *charFreq) {
             } else {
                 /* Handle Null */ 
             }
-
             *_HNodeStack = createNode(string, charFreq[i], NULL, NULL);
             _HNodeStack++;
         }
     }
-    qsort(HNodeStack, stackSize, sizeof(struct node **), cmpNodes);
-
-    return HNodeStack;
+    sortHNodeFreq(HNodeStack, stackSize);
+    return HNodeStack;          /* MUST Free Stack */
 }
 
 struct node *createHTree(int *charFreq) {
@@ -123,9 +161,10 @@ struct node *createHTree(int *charFreq) {
                 HNodeStack[i] = HNodeStack[i + 1];
             }
         }
-
-        qsort(HNodeStack, stackSize - j, sizeof(*HNodeStack), cmpNodes);
+        sortHNodeFreq(HNodeStack, stackSize - j);
         j++;
     }
-    return HNodeStack[0];
+    struct node *HTree = HNodeStack[0];
+    free(HNodeStack);
+    return HTree;
 }

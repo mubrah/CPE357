@@ -17,6 +17,9 @@
 #ifndef WORDS_H
 #define WORDS_H
 
+#define NUMCHAR 128     /* 128 characters in ASCII */
+
+
 char *fileToStr(FILE *file);
 int *countChars(char *string);
 void freeCharFreq(int *charFreq);

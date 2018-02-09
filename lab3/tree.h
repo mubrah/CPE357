@@ -12,6 +12,7 @@
 struct node {
     char *string;
     int freq;
+    char *code;
     struct node *left;
     struct node *right;
 };
