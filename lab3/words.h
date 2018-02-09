@@ -22,6 +22,7 @@
 
 char *fileToStr(FILE *file);
 int *countChars(char *string);
-void freeCharFreq(int *charFreq);
+void sortHNodeFreq(struct node **nodeStack, int stackSize);
+void sortHNodeChar(struct node **nodeList, int stackSize);
 struct node *createHTree(int *charFreq);
 #endif

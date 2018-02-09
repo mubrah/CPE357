@@ -13,5 +13,8 @@
 #ifndef HTABLE_H
 #define HTABLE_H
 
+void appendString(char *existing, char *toAppend, char *buffer);
+void getCodes(struct node *HTree, struct node **finalCodes, char *bitString);
+int main(int argc, char **argv);
 #endif
 
