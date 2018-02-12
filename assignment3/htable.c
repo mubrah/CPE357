@@ -68,6 +68,7 @@ void freeHTable(struct HTable *htable) {
  */
 struct HTable *getHTable(int fd) {
     unsigned int numNodes = 0;
+    unsigned int totalChars = 0;
     int *charFreqTable = NULL;
     struct node *htree = NULL;
     struct node **finalCodes;
@@ -77,6 +78,7 @@ struct HTable *getHTable(int fd) {
     close(fd);
     htree = createHTree(charFreqTable);
     numNodes = charFreqTable[NUMCHAR];
+    totalChars = charFreqTable[NUMCHAR + 1];
     free(charFreqTable);
     if ((finalCodes = calloc(numNodes, sizeof(*finalCodes))) == NULL) {
         /* Handle NULL */
@@ -94,6 +96,7 @@ struct HTable *getHTable(int fd) {
         /* Handle NULL */
     }
     htable->uniqChars = numNodes;
+    htable->totalChars = totalChars;
     htable->charFreqNodes = finalCodes;
     htable->htree = htree;
     return htable;      /* MUST free HTable */

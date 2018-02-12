@@ -2,6 +2,7 @@
 #include <stdio.h>
 #endif
 
+
 #ifndef TREE_H
 #include "tree.h"
 #endif
@@ -9,6 +10,7 @@
 #ifndef WORDS_H
 #include "words.h"
 #endif
+
 
 #ifndef HTABLE_H
 #define HTABLE_H
@@ -21,7 +23,8 @@
  *   debug but is used by freeNode to free all the leaves in the HTree
  */
 struct HTable {
-    int uniqChars;
+    unsigned int uniqChars;
+    unsigned int totalChars;
     struct node **charFreqNodes;
     struct node *htree;
 };

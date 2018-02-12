@@ -6,14 +6,16 @@ int *countChars(int fd) {
     int *charFreq = NULL;
     int i = 0;
     unsigned int uniqChar = 0;
+    unsigned int totalChar = 0;
     int retRead = 1;
     char readBuffer[IOBUFFSIZE];
     
     /* Character Frequency Table has indexes:
      * 0-127: ASCII Codes
-     * 128  : NUmber of unique Characters
+     * 128  : Number of unique Characters
+     * 129  : Total number of chars counted
      */
-    if ((charFreq = calloc(NUMCHAR + 1, sizeof(*charFreq))) == NULL) {
+    if ((charFreq = calloc(NUMCHAR + 2, sizeof(*charFreq))) == NULL) {
         /* Handle Null */
     }
 
@@ -22,9 +24,13 @@ int *countChars(int fd) {
         if (charFreq[(int)*readBuffer] == 0) {
             uniqChar++;
         }
-        charFreq[(int)*readBuffer]++;
+        if (retRead > 0) {
+            totalChar++;
+            charFreq[(int)*readBuffer]++;
+        }
     }
     charFreq[NUMCHAR] = uniqChar;
+    charFreq[NUMCHAR + 1] = totalChar;
     return charFreq;            /* MUST Free table */
 }
 
