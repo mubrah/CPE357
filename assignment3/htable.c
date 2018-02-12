@@ -86,12 +86,12 @@ struct HTable *getHTable(int fd) {
     getCodes(htree, finalCodes, NULL);
     sortHNodeChar(finalCodes, numNodes);
 
-    /* Debug Output
+    /* Debug Output */
     int i = 0;
     for (i = 0; i < numNodes; i++) {
         printf("0x%02x: %s\n", (char)finalCodes[i]->string[0], finalCodes[i]->code);
     }
-    */
+    
     if ((htable = malloc(sizeof(*htable))) == NULL) {
         /* Handle NULL */
     }

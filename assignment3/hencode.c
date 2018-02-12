@@ -28,23 +28,25 @@ void writeHeader(int fd, struct HTable *htable) {
  * the contents of the buffer and return a new uint8 to write to, else 
  * return the existing buffer.
  */
-uint8_t binAppendWrite(int fd, uint8_t buffer, int binVal, int bufferLength) {
+uint8_t binAppendWrite(int fd, uint8_t buffer, int binVal, int *buffWrIdx) {
     uint8_t shiftVal = binVal;
-
+ 
     if (shiftVal == 48) {               /* 0 ASCII = 48 */
-        if (bufferLength + 1 < 8) {
+        if (*buffWrIdx < 8) {
             return buffer;
         } else {
             write(fd, &buffer, 1);
+            *buffWrIdx = 0;
             return 0;                   /* "Empty" Buffer */
         }
     } else if (shiftVal == 49) {        /* 1 ASCII = 49 */ 
-        shiftVal = (int)1;
-        shiftVal <<= 7 - bufferLength;
-        if (bufferLength + 1 < 8) {
+        if (*buffWrIdx < 8) {
+            shiftVal = (int)1;
+            shiftVal <<= 7 - *buffWrIdx;
             return buffer + shiftVal;
         } else {
             write(fd, &buffer, 1);
+            *buffWrIdx = 0;
             return 128;                /* New buffer with 1 in the MSB */
         }
     }
@@ -55,24 +57,25 @@ void writeMsg(int infd, int outfd, struct HTable *htable) {
     int i, j;
     char readBuffer[1];
     uint8_t writeBuffer = 0;
-    int buffWrIdx = 0;
+    int *buffWrIdx = NULL;
+
+    if (buffWrIdx = calloc(1, sizeof(*buffWrIdx))) {
+        /* Handle NULL */
+    }
 
     while (retRead > 0) {
         retRead = read(infd, readBuffer, 1);
         for (i = 0; i < htable->uniqChars; i++) {
-            char *code = htable->charFreqNodes[i]->code;
-            if (htable->charFreqNodes[i]->string[0] == *readBuffer) { 
+            if (htable->charFreqNodes[i]->string[0] == *readBuffer) {
+                char *code = htable->charFreqNodes[i]->code;
                 for (j = 0; j < strlen(code); j++) {
                     writeBuffer = binAppendWrite(outfd, writeBuffer, (int)code[j], buffWrIdx);
-                    if (buffWrIdx < 7) {
-                        buffWrIdx++;
-                    } else {
-                        buffWrIdx = 0;
-                    }
+                    *buffWrIdx += 1;
                 }
             }
         }
     }
+    free(buffWrIdx);
 }
 
 int main (int argc, char **argv) {
