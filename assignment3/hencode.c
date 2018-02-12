@@ -82,6 +82,11 @@ int main (int argc, char **argv) {
     int infd, outfd;
     struct HTable *htable = NULL;
 
+    if (argc == 1) {
+        perror("usage: ./hencode infile [ outfile ]\n");
+        return 1;
+    }
+
     infd = open(argv[1], O_RDONLY);
     if (infd == -1) {
         perror(argv[1]);
@@ -91,15 +96,20 @@ int main (int argc, char **argv) {
     htable = getHTable(infd);
     close(infd);
 
-    outfd = open(argv[2], O_WRONLY | O_CREAT | O_APPEND);
-    if (outfd == -1) {
-        perror(argv[2]);
-        exit(1);
+    if (argc == 2) {
+        outfd = 1;
+    } else {
+        outfd = open(argv[2], O_WRONLY | O_CREAT | O_APPEND);
+        if (outfd == -1) {
+            perror(argv[2]);
+            exit(1);
+        }
     }
 
     writeHeader(outfd, htable);
     infd = open(argv[1], O_RDONLY);
     writeMsg(infd, outfd, htable);
+
     if (infd == -1) {
         perror(argv[1]);
         exit(1);
