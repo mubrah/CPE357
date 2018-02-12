@@ -2,4 +2,5 @@ make clean
 rm -rf output 
 make -f Makefile
 ./hencode test output
+chmod u+r output
 od -t x1 output

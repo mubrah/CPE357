@@ -31,20 +31,21 @@ void writeHeader(int fd, struct HTable *htable) {
 uint8_t binAppendWrite(int fd, uint8_t buffer, int binVal, int bufferLength) {
     uint8_t shiftVal = binVal;
 
-    if (shiftVal == 0) {
+    if (shiftVal == 48) {               /* 0 ASCII = 48 */
         if (bufferLength + 1 < 8) {
             return buffer;
         } else {
             write(fd, &buffer, 1);
-            return 0;   /* "Empty" Buffer */
+            return 0;                   /* "Empty" Buffer */
         }
-    } else if (shiftVal == 1) {
-        shiftVal <<= bufferLength;
+    } else if (shiftVal == 49) {        /* 1 ASCII = 49 */ 
+        shiftVal = (int)1;
+        shiftVal <<= 7 - bufferLength;
         if (bufferLength + 1 < 8) {
             return buffer + shiftVal;
         } else {
             write(fd, &buffer, 1);
-            return 80;  /* New buffer with 1 in the MSB */
+            return 128;                /* New buffer with 1 in the MSB */
         }
     }
 }
@@ -59,10 +60,15 @@ void writeMsg(int infd, int outfd, struct HTable *htable) {
     while (retRead > 0) {
         retRead = read(infd, readBuffer, 1);
         for (i = 0; i < htable->uniqChars; i++) {
-            if (htable->charFreqNodes[i]->string[0] == readBuffer) { /* TODO: This cond. doesnt work */
-                for (j = 0; j < strlen(htable->charFreqNodes[i]->code); j++) {
-                    binAppendWrite(outfd, writeBuffer, htable->charFreqNodes[i]->code[j], buffWrIdx);
-                    buffWrIdx++;
+            char *code = htable->charFreqNodes[i]->code;
+            if (htable->charFreqNodes[i]->string[0] == *readBuffer) { 
+                for (j = 0; j < strlen(code); j++) {
+                    writeBuffer = binAppendWrite(outfd, writeBuffer, (int)code[j], buffWrIdx);
+                    if (buffWrIdx < 7) {
+                        buffWrIdx++;
+                    } else {
+                        buffWrIdx = 0;
+                    }
                 }
             }
         }
