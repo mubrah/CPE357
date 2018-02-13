@@ -71,7 +71,7 @@ struct HTable *getHTable(int fd) {
     unsigned int totalChars = 0;
     int *charFreqTable = NULL;
     struct node *htree = NULL;
-    struct node **finalCodes;
+    struct node **finalCodes = NULL;
     struct HTable *htable = NULL;
 
     charFreqTable = countChars(fd);

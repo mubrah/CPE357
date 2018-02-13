@@ -78,7 +78,7 @@ void writeMsg(int infd, int outfd, struct HTable *htable) {
     free(buffWrIdx);
 }
 
-int main (int argc, char **argv) {
+int main(int argc, char **argv) {
     int infd, outfd;
     struct HTable *htable = NULL;
 
