@@ -113,5 +113,8 @@ int main(int argc, char **argv) {
     }
     */
 
-    
+    free(charFreqTable);
+    freeNode(htree);
+    close(infd);
+    close(outfd);
 }
