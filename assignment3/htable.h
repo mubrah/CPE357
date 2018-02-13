@@ -2,6 +2,13 @@
 #include <stdio.h>
 #endif
 
+#ifndef _STDIO_H_
+#include <stdio.h>
+#endif
+
+#ifndef _UNISTD_H_
+#include <unistd.h>
+#endif
 
 #ifndef TREE_H
 #include "tree.h"

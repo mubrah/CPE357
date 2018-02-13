@@ -4,7 +4,6 @@
 
 int *countChars(int fd) {
     int *charFreq = NULL;
-    int i = 0;
     unsigned int uniqChar = 0;
     unsigned int totalChar = 0;
     int retRead = 1;
@@ -112,34 +111,35 @@ struct node *createHTree(int *charFreq) {
     int j = 1;
     int stackSize = charFreq[NUMCHAR];
     char *string = NULL;
-    struct node **HNodeStack = NULL;
+    struct node *htree = NULL;
+    struct node **hnodeStack = NULL;
     struct node *newNode = NULL;
 
-    HNodeStack = createHNodeStack(charFreq);
-    while (HNodeStack[1] != NULL) {
-        if ((string = malloc(sizeof(*string) * strlen(HNodeStack[0]->string) + strlen(HNodeStack[1]->string) + 1)) == NULL) {
+    hnodeStack = createHNodeStack(charFreq);
+    while (hnodeStack[1] != NULL) {
+        if ((string = malloc(sizeof(*string) * strlen(hnodeStack[0]->string) + strlen(hnodeStack[1]->string) + 1)) == NULL) {
             /* Handle Null */
         }
-        strcpy(string, HNodeStack[0]->string);
-        newNode = createNode(strcat(string, HNodeStack[1]->string),
-                             HNodeStack[0]->freq + HNodeStack[1]->freq,
+        strcpy(string, hnodeStack[0]->string);
+        newNode = createNode(strcat(string, hnodeStack[1]->string),
+                             hnodeStack[0]->freq + hnodeStack[1]->freq,
                              NULL,
-                             HNodeStack[0],
-                             HNodeStack[1]);
-        HNodeStack[0] = newNode;
+                             hnodeStack[0],
+                             hnodeStack[1]);
+        hnodeStack[0] = newNode;
 
         /* Rebuild stack by moving all elements up a position */
         for (i = 1; i < stackSize; i++) {
             if (i == stackSize - 1) {
-                HNodeStack[i] = NULL;
+                hnodeStack[i] = NULL;
             } else {
-                HNodeStack[i] = HNodeStack[i + 1];
+                hnodeStack[i] = hnodeStack[i + 1];
             }
         }
-        sortHNodeFreq(HNodeStack, stackSize - j);
+        sortHNodeFreq(hnodeStack, stackSize - j);
         j++;
     }
-    struct node *HTree = HNodeStack[0];
-    free(HNodeStack);
-    return HTree;       /* MUST Free HTree */
+    htree = hnodeStack[0];
+    free(hnodeStack);
+    return htree;       /* MUST Free htree */
 }

@@ -1,9 +1,9 @@
-#ifndef _STDLIB_H_
-#include <stdlib.h>
-#endif
-
 #ifndef _STDIO_H_
 #include <stdio.h>
+#endif
+
+#ifndef _STDLIB_H_
+#include <stdlib.h>
 #endif
 
 #ifndef TREE_H
