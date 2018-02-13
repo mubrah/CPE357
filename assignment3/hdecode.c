@@ -70,31 +70,28 @@ void decodeMessage(int infd, int outfd, struct node *htree) {
 
 int main(int argc, char **argv) {
     int infd, outfd;
-    unsigned int numNodes;
     int *charFreqTable = NULL;
     struct node *htree = NULL;
-    struct node **finalCodes = NULL;
-    struct HTable *htable = NULL;
 
     if (argc == 1) {
         perror("usage: hdecode [(infile | -) [outfile]]\n");
     }
     
-    infd = open(argv[1], O_RDONLY);
-    if (infd == -1) {
-        perror(argv[1]);
-        exit(1);
+    if ((argv[1][0] == '-') && (strlen(argv[1]) == 1)) {
+        infd = 0;
+    } else {
+        infd = open(argv[1], O_RDONLY);
+        if (infd == -1) {
+            perror(argv[1]);
+            exit(1);
+        }
     }
 
     if (argc == 2) {
         outfd = 1;
     }
 
-    if (argc == 3) {
-        if (argv[1] == "-") {
-            close(infd);
-            infd = 0;
-        }
+    if (argc >= 3) {
         outfd = open(argv[2], O_WRONLY | O_CREAT | O_APPEND);
         if (outfd == -1) {
             perror(argv[2]);
