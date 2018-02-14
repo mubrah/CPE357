@@ -19,7 +19,10 @@ void encodeMessage(int infd, int outfd, struct HTable *htable) {
                 if (htable->charFreqNodes[i]->string[0] == readBuffer) {
                     char *code = htable->charFreqNodes[i]->code;
                     for (j = 0; j < strlen(code); j++) {
-                        writeBuffer = appendWriteBit(outfd, writeBuffer, (int)code[j], buffWrIdx);
+                        writeBuffer = appendWriteBit(outfd,
+                                                    writeBuffer,
+                                                    (int)code[j],
+                                                    buffWrIdx);
                         *buffWrIdx -= 1;
                     }
                     break;

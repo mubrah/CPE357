@@ -1,6 +1,7 @@
 #include "tree.h"
 
-struct node *createNode(char *string, int freq, char *code, struct node *left, struct node *right) {
+struct node *createNode(char *string, int freq, char *code, struct node *left,
+                        struct node *right) {
     struct node *newNode = NULL;
 
     if ((newNode = malloc(sizeof(*newNode))) != NULL) {

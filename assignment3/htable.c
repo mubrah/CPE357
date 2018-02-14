@@ -40,7 +40,8 @@ void getCodes(struct node *HTree, struct node **finalCodes, char *bitString) {
         if (finalCodes) {
             char *charCode = NULL;
             struct node **_finalCodes = finalCodes;
-            if ((charCode = malloc(sizeof(*charCode) * strlen(bitString) + 1)) == NULL) {
+            if ((charCode = malloc(sizeof(*charCode) * strlen(bitString) + 1))
+                == NULL) {
                 /* Handle NULL */
             }
             strcpy(charCode, bitString);
