@@ -35,6 +35,13 @@ void encodeMessage(int infd, int outfd, struct HTable *htable) {
     free(buffWrIdx);
 }
 
+void cleanup(int infd, int outfd, struct HTable *htable) {
+    close(outfd);
+    close(infd);
+    free(htable->charFreqNodes);
+    free(htable);
+}
+
 int main(int argc, char **argv) {
     int infd, outfd;
     struct HTable *htable = NULL;
@@ -60,6 +67,10 @@ int main(int argc, char **argv) {
     }
 
     htable = getHTable(infd);
+    if (htable->htree == NULL) {
+        cleanup(infd, outfd, htable);
+        exit(0);
+    }
     close(infd);
     writeHeader(outfd, htable);
     infd = open(argv[1], O_RDONLY);
@@ -70,8 +81,6 @@ int main(int argc, char **argv) {
     }
 
     encodeMessage(infd, outfd, htable);
-    close(outfd);
-    close(infd);
-    freeHTable(htable);
+    cleanup(infd, outfd, htable);
     exit(0);
 }

@@ -59,6 +59,11 @@ int main(int argc, char **argv) {
     }
     
     charFreqTable = readHeader(infd);
+    if (*charFreqTable == -1) {
+        close(infd);
+        close(outfd);
+        exit(0);
+    }
     htree = createHTree(charFreqTable);
     decodeMessage(infd, outfd, htree);
     free(charFreqTable);

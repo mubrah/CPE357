@@ -65,7 +65,13 @@ int *readHeader(int fd) {
     uint32_t freq;
     int i;
 
-    read(fd, &numChars, 4);   /* TODO: Handle error when input file is empty */
+    if (read(fd, &numChars, 4) <= 0) {
+        if ((charFreq = malloc(sizeof(*charFreq))) == NULL) {
+            /* Handle NULL */
+        }
+        *charFreq = -1;
+        return charFreq;
+    }
 
     /* Character Frequency Table has indexes:
      * 0-127: ASCII Codes

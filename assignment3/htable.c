@@ -21,17 +21,23 @@ void appendString(char *existing, char *toAppend, char *buffer) {
  *****************************************************************************/
 void getCodes(struct node *HTree, struct node **finalCodes, char *bitString) {
     int lenBitString = 0;
+    if (HTree == NULL) {
+        finalCodes = NULL;
+        return;
+    }
     if (bitString != NULL) {
         lenBitString = strlen(bitString);
     }
     if (HTree->left != NULL) {
-        char *leftBitString = malloc(sizeof(*leftBitString) * (lenBitString + 2));
+        char *leftBitString = malloc(sizeof(*leftBitString) *
+                                    (lenBitString + 2));
         appendString(bitString, "0", leftBitString);
         getCodes(HTree->left, finalCodes, leftBitString);
         free(leftBitString);
     } 
     if (HTree->right != NULL) {
-        char *rightBitString = malloc(sizeof(*rightBitString) * (lenBitString + 2));
+        char *rightBitString = malloc(sizeof(*rightBitString) *
+                                     (lenBitString + 2));
         appendString(bitString, "1", rightBitString);
         getCodes(HTree->right, finalCodes, rightBitString);
         free(rightBitString);

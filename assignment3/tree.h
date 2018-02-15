@@ -17,6 +17,7 @@ struct node {
     struct node *right;
 };
 
-struct node *createNode(char *string, int freq, char *code, struct node *left, struct node *right);
+struct node *createNode(char *string, int freq, char *code, struct node *left,
+                        struct node *right);
 void freeNode(struct node *node);
 #endif
