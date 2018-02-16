@@ -13,7 +13,10 @@ void decodeMessage(int infd, int outfd, struct node *htree) {
             for (i = 7; i >= 0; i--) {
                 if ((_htree->left == NULL) && (_htree->right == NULL)) {
                     writeBuffer = _htree->string[0];
-                    write(outfd, &writeBuffer, 1);
+                    if (_htree->freq > 0) {
+                        write(outfd, &writeBuffer, 1);
+                    }
+                    _htree->freq--;
                     _htree = htree;
                 }
                 turnLR = readBit(readBuffer, i);
@@ -24,37 +27,8 @@ void decodeMessage(int infd, int outfd, struct node *htree) {
                 }
             }
         } else {
-            for (i = 7; i >= 0; i--) {
-                if ((_htree->left == NULL) && (_htree->right == NULL)) {
-                    writeBuffer = _htree->string[0];
-                    write(outfd, &writeBuffer, 1);
-                    _htree = htree;
-                }
-                turnLR = readBit(readBuffer, i);
-                if (turnLR == 0) {
-                    _htree = _htree->left;
-                } else if (turnLR == 1) {
-                    _htree = _htree->right;
-                }
-            }
+            /* write(outfd, &writeBuffer, 1);*/
         }
-    }
-}
-
-void cleanup(int infd, int outfd, int *charFreqTable, struct node *htree,
-             int mode) {
-    close(infd);
-    close(outfd);
-    switch (mode) {
-        case 0:
-            break;
-        case 1:
-            free(charFreqTable);
-            break;
-        default:
-            free(charFreqTable);
-            freeNode(htree);
-            break;
     }
 }
 
@@ -88,26 +62,11 @@ int main(int argc, char **argv) {
     }
     
     charFreqTable = readHeader(infd);
-    if (*charFreqTable == -1) {             /* Empty file scenario */
-        cleanup(infd, outfd, charFreqTable, htree, 0);
-        exit(0);
-    } else if (charFreqTable[NUMCHAR] == 1) {   /* 1 char file Scenario */
-        int i, j;
-
-        for (i = 0; i < NUMCHAR; i++) {
-            if (charFreqTable[i] > 0) {
-                j = charFreqTable[i];
-                while (j > 0) { 
-                    write(outfd, &i, 1);
-                    j--;
-                }
-            }
-        }
-        cleanup(infd, outfd, charFreqTable, htree, 1);
-        exit(0);
-    }
     htree = createHTree(charFreqTable);
     decodeMessage(infd, outfd, htree);
-    cleanup(infd, outfd, charFreqTable, htree, charFreqTable[NUMCHAR]);
+    free(charFreqTable);
+    freeNode(htree);
+    close(infd);
+    close(outfd);
     exit(0);
 }
