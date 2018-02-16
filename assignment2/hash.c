@@ -117,7 +117,7 @@ struct hashTable *reHashTable(struct hashTable *oldTable) {
         /* Handle failure to allocate memory */
     }
 
-    newTable->capacity = oldTable->capacity * 4 - 1;      /* 2^(oldCap + 2) - 1 */
+    newTable->capacity = oldTable->capacity * 4 - 1;    /* 2^(oldCap + 2) - 1 */
     newTable->count = 0;
     newTable->uniqCount = 0;
 

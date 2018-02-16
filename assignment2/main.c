@@ -51,7 +51,6 @@ int main(int argc, char **argv) {
         if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
             fprintf(stderr, "%s: No such file or directory\n",
                     argv[filenameIdxs[idx]]);
-            return 1;
         }
         table = countWords(file, table);
         fclose(file);
@@ -74,10 +73,10 @@ int main(int argc, char **argv) {
 
     int minWords = table->uniqCount < numWords ? table->uniqCount : numWords;
     printf("The top %i words (out of %i) are:\n",
-           minWords, minWords < numWords ? minWords : table->uniqCount);
+           numWords, table->uniqCount);
     qsort(words, table->uniqCount, sizeof(struct wordCount *), cmpWordCount);
     for (idx = 0; idx < minWords; idx++) {
-        printf("%10d %s\n", words[idx]->count, words[idx]->string);
+        printf("%9d %s\n", words[idx]->count, words[idx]->string);
     }
     
 
