@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     }
 
     struct hashTable *table = makeHashTable();
-    if (fnIdx < 0) {
+    if (fnIdx > 0) {
         FILE *file = NULL;
         for (idx = 0; idx < fnIdx; idx++) {
             if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
