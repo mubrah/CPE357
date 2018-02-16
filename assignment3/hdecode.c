@@ -27,7 +27,10 @@ void decodeMessage(int infd, int outfd, struct node *htree) {
             for (i = 7; i >= 0; i--) {
                 if ((_htree->left == NULL) && (_htree->right == NULL)) {
                     writeBuffer = _htree->string[0];
-                    write(outfd, &writeBuffer, 1);
+                    if (_htree->freq > 0) {
+                        write(outfd, &writeBuffer, 1);
+                    }
+                    _htree->freq--;
                     _htree = htree;
                 }
                 turnLR = readBit(readBuffer, i);
@@ -38,7 +41,7 @@ void decodeMessage(int infd, int outfd, struct node *htree) {
                 }
             }
         } else {
-            write(outfd, &writeBuffer, 1);
+            /* write(outfd, &writeBuffer, 1); */
         }
     }
 }
