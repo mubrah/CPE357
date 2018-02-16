@@ -35,11 +35,18 @@ void encodeMessage(int infd, int outfd, struct HTable *htable) {
     free(buffWrIdx);
 }
 
-void cleanup(int infd, int outfd, struct HTable *htable) {
+void cleanup(int infd, int outfd, struct HTable *htable, int mode) {
     close(outfd);
     close(infd);
-    free(htable->charFreqNodes);
-    free(htable);
+    switch (mode) {
+        case 0:
+            free(htable->charFreqNodes);
+            free(htable);
+            break;
+        case 1:
+            freeHTable(htable);
+            break;
+    }
 }
 
 int main(int argc, char **argv) {
@@ -67,12 +74,19 @@ int main(int argc, char **argv) {
     }
 
     htable = getHTable(infd);
-    if (htable->htree == NULL) {
-        cleanup(infd, outfd, htable);
+    if (htable->htree == NULL) {        /* Empty file requires no charFreq */
+    char empty[] = "\0\0\0\0";
+        write(outfd, &empty, 4);
+        cleanup(infd, outfd, htable, 0);
         exit(0);
     }
     close(infd);
     writeHeader(outfd, htable);
+    if (htable->uniqChars == 1) {       /* 1 Char file requires no codes */
+        cleanup(infd, outfd, htable, 0);
+        exit(0);        
+    }
+
     infd = open(argv[1], O_RDONLY);
 
     if (infd == -1) {
@@ -81,6 +95,6 @@ int main(int argc, char **argv) {
     }
 
     encodeMessage(infd, outfd, htable);
-    cleanup(infd, outfd, htable);
+    cleanup(infd, outfd, htable, 1);
     exit(0);
 }

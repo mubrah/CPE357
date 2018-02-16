@@ -65,9 +65,11 @@ int *readHeader(int fd) {
     uint32_t freq;
     int i;
 
-    if (read(fd, &numChars, 4) <= 0) {
-        if ((charFreq = malloc(sizeof(*charFreq))) == NULL) {
-            /* Handle NULL */
+    read(fd, &numChars, 4);
+
+    if (numChars == 0) {        /* Empty File Scenario */
+        if ((charFreq = calloc(1, sizeof(*charFreq))) == NULL) {
+            /* Handle Null */
         }
         *charFreq = -1;
         return charFreq;

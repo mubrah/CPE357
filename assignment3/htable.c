@@ -11,52 +11,53 @@ void appendString(char *existing, char *toAppend, char *buffer) {
 }
 
 /* ****************************************************************************
- * struct node **FinalCodes is a storage struct with the # of leafs (# of chars
+ * struct node **leafNodes is a storage struct with the # of leafs (# of chars
  * with a count > 0 which is kept track in idx 128 of charFreqTable) so the 
  * codes can be used later.
- * If passed a NULL, the codes will be printed in prefixed order.
  * ==== ====
  * char *bitstring is used to pass values thru recursive call.
  * Pass a NULL to this parameter at the top call
  *****************************************************************************/
-void getCodes(struct node *HTree, struct node **finalCodes, char *bitString) {
+void getCodes(struct node *htree, struct node **leafNodes, char *bitString) {
     int lenBitString = 0;
-    if (HTree == NULL) {
-        finalCodes = NULL;
+    if (htree == NULL) {
+        leafNodes = NULL;
         return;
     }
     if (bitString != NULL) {
         lenBitString = strlen(bitString);
     }
-    if (HTree->left != NULL) {
+    if (htree->left != NULL) {
         char *leftBitString = malloc(sizeof(*leftBitString) *
                                     (lenBitString + 2));
         appendString(bitString, "0", leftBitString);
-        getCodes(HTree->left, finalCodes, leftBitString);
+        getCodes(htree->left, leafNodes, leftBitString);
         free(leftBitString);
     } 
-    if (HTree->right != NULL) {
+    if (htree->right != NULL) {
         char *rightBitString = malloc(sizeof(*rightBitString) *
                                      (lenBitString + 2));
         appendString(bitString, "1", rightBitString);
-        getCodes(HTree->right, finalCodes, rightBitString);
+        getCodes(htree->right, leafNodes, rightBitString);
         free(rightBitString);
     }
-    if (HTree->right == NULL && HTree->left == NULL) {
-        if (finalCodes) {
+    if (htree->right == NULL && htree->left == NULL) {
+        if (leafNodes) {
             char *charCode = NULL;
-            struct node **_finalCodes = finalCodes;
+            struct node **_leafNode = leafNodes;
             if ((charCode = malloc(sizeof(*charCode) * strlen(bitString) + 1))
                 == NULL) {
                 /* Handle NULL */
             }
+
             strcpy(charCode, bitString);
             charCode[strlen(bitString)] = '\0';
-            HTree->code = charCode;
-            while (*_finalCodes) {
-                _finalCodes++;
+            htree->code = charCode;
+            /* Add Node to leafNodes */
+            while (*_leafNode) {
+                _leafNode++;
             }
-            *_finalCodes = HTree;
+            *_leafNode = htree;
         }
     }
 }
@@ -76,27 +77,33 @@ struct HTable *getHTable(int fd) {
     unsigned int totalChars = 0;
     int *charFreqTable = NULL;
     struct node *htree = NULL;
-    struct node **finalCodes = NULL;
+    struct node **leafNodes = NULL;
     struct HTable *htable = NULL;
 
     charFreqTable = countChars(fd);
     close(fd);
     htree = createHTree(charFreqTable);
-    numNodes = charFreqTable[NUMCHAR];
+    numNodes = charFreqTable[NUMCHAR];      /* Will be 1 for empty file */
     totalChars = charFreqTable[NUMCHAR + 1];
     free(charFreqTable);
-    if ((finalCodes = calloc(numNodes, sizeof(*finalCodes))) == NULL) {
+    if ((leafNodes = calloc(numNodes, sizeof(*leafNodes))) == NULL) {
         /* Handle NULL */
-    } 
-    getCodes(htree, finalCodes, NULL);
-    sortHNodeChar(finalCodes, numNodes);
+    }
+    if (totalChars == 0) {                  /* Empty file scenatio */
+        leafNodes[0] = htree;                  /* htree is NULL */
+    } else if (numNodes == 1) {             /* 1 char file scenario */
+        leafNodes[0] = htree;
+    } else {                                /* Everything else */
+        getCodes(htree, leafNodes, NULL);
+        sortHNodeChar(leafNodes, numNodes);
+    }
     
     if ((htable = malloc(sizeof(*htable))) == NULL) {
         /* Handle NULL */
     }
     htable->uniqChars = numNodes;
     htable->totalChars = totalChars;
-    htable->charFreqNodes = finalCodes;
+    htable->charFreqNodes = leafNodes;
     htable->htree = htree;
     return htable;      /* MUST free HTable */
 }

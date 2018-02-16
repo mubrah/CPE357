@@ -22,6 +22,6 @@
 #define HENCODE_H
 
 void encodeMessage(int infd, int outfd, struct HTable *htable);
-void cleanup(int infd, int outfd, struct HTable *htable);
+void cleanup(int infd, int outfd, struct HTable *htable, int mode);
 int main(int argc, char **argv);
 #endif
