@@ -97,7 +97,7 @@ struct hashTable *insertHashTable(struct hashTable *table, char *word) {
     int offset;
 
     if ((double)table->uniqCount / table->capacity > 0.75) {
-        table = reHashTable(table);
+        /* table = reHashTable(table); */
         /* printf("Rehash!\n"); */
     }
 

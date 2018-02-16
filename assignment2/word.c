@@ -32,6 +32,10 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
 
     while (1) {
         char c = fgetc(file);
+        if ('A' < c && c < 'Z') {
+            c += 32; 
+        }
+
         if (feof(file)) {
             break;
         } else {
