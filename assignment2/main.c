@@ -26,7 +26,8 @@ int main(int argc, char **argv) {
                         numWords = strtol(argv[idx + 1], NULL, 10);
                         idx++;
                     } else {
-                        fprintf(stderr, "usage: fw [-n num] [ file1 [ file 2 ...] ]\n");
+                        fprintf(stderr,
+                               "usage: fw [-n num] [ file1 [ file 2 ...] ]\n");
                         return 1;
                     }
                     break;
@@ -48,7 +49,8 @@ int main(int argc, char **argv) {
     FILE *file = NULL;
     for (idx = 0; idx < fnIdx; idx++) {
         if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
-            fprintf(stderr, "%s: No such file or directory\n", argv[filenameIdxs[idx]]);
+            fprintf(stderr, "%s: No such file or directory\n",
+                    argv[filenameIdxs[idx]]);
             return 1;
         }
         table = countWords(file, table);
@@ -71,7 +73,8 @@ int main(int argc, char **argv) {
     }
 
     int minWords = table->uniqCount < numWords ? table->uniqCount : numWords;
-    printf("The top %i words (out of %i) are:\n", minWords, minWords < numWords ? minWords : table->uniqCount);
+    printf("The top %i words (out of %i) are:\n",
+           minWords, minWords < numWords ? minWords : table->uniqCount);
     qsort(words, table->uniqCount, sizeof(struct wordCount *), cmpWordCount);
     for (idx = 0; idx < minWords; idx++) {
         printf("%10d %s\n", words[idx]->count, words[idx]->string);
@@ -85,7 +88,8 @@ int main(int argc, char **argv) {
                 struct chain *_buckets = table->buckets[i];
                 int j = 0;
                 while (_buckets != NULL) {
-                    printf("[%i][%i]: %s | %i\n", _buckets->hash, j, _buckets->word->string, _buckets->word->count);
+                    printf("[%i][%i]: %s | %i\n", _buckets->hash, j,
+                    _buckets->word->string, _buckets->word->count);
                     _buckets = _buckets->next;
                     j++;
                 }

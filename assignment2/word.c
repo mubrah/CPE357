@@ -25,7 +25,8 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
     int bufferLength = 256;
     int bufferSize = 0;
 
-    if ((stringBuffer = (char *)malloc(bufferLength * sizeof(*stringBuffer))) == NULL) {
+    if ((stringBuffer = (char *)malloc(bufferLength *
+        sizeof(*stringBuffer))) == NULL) {
         /* Handle failure to allocate memory */
     }
 
@@ -36,7 +37,8 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
         } else {
             if (bufferSize == bufferLength) {
                 bufferLength *= 2;
-                if ((stringBuffer = (char *)realloc(stringBuffer-bufferSize, bufferLength)) == NULL) {
+                if ((stringBuffer = (char *)realloc(stringBuffer-bufferSize,
+                    bufferLength)) == NULL) {
                     /* Handle failure to allocate memory */
                 }
                 stringBuffer += bufferSize;

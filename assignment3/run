@@ -1,6 +1,0 @@
-make clean
-rm -rf output 
-make -f Makefile
-./hencode $1 output
-chmod u+r output
-od -t x1 output

@@ -30,7 +30,8 @@ struct hashTable *makeHashTable(void);
 void freeChain(struct chain *link);
 void destroyHashTable(struct hashTable *table);
 int chainContains(struct chain *toSearch, char *string);
-struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount, int hash);
+struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount,
+    int hash);
 struct hashTable *insertHashTable(struct hashTable *table, char *word);
 struct hashTable *reHashTable(struct hashTable *oldTable);
 

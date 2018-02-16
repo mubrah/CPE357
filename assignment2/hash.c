@@ -28,7 +28,8 @@ struct hashTable *makeHashTable(void) {
     table->count = 0;
     table->uniqCount = 0;
 
-    if ((buckets = (struct chain **)malloc((table->capacity) * sizeof(struct chain *))) == NULL) {
+    if ((buckets = (struct chain **)malloc((table->capacity) *
+                    sizeof(struct chain *))) == NULL) {
         /* Handle failure to allocate memory */
     }
 
@@ -68,7 +69,8 @@ int chainContains(struct chain *toSearch, char *string) {
     }
 }
 
-struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount, int hash) {
+struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount,
+                       int hash) {
     if (existingChain == NULL) {
         struct chain *newChain;
         struct wordCount *newWord;
@@ -83,7 +85,8 @@ struct chain *addChain(struct chain *existingChain, char *word, int *uniqCount, 
         return newChain;
     } else {
         if (!chainContains(existingChain, word)) {
-            existingChain->next = addChain(existingChain->next, word, uniqCount, hash);
+            existingChain->next = addChain(existingChain->next, word,
+                                           uniqCount, hash);
         }
         return existingChain;
     }
@@ -100,7 +103,8 @@ struct hashTable *insertHashTable(struct hashTable *table, char *word) {
 
     hash = hashString(word);
     offset = hash % (table->capacity);
-    table->buckets[offset] = addChain(table->buckets[offset], word, &(table->uniqCount), offset);
+    table->buckets[offset] = addChain(table->buckets[offset], word,
+                                      &(table->uniqCount), offset);
     return table;
 }
 
@@ -117,7 +121,8 @@ struct hashTable *reHashTable(struct hashTable *oldTable) {
     newTable->count = 0;
     newTable->uniqCount = 0;
 
-    if ((buckets = (struct chain **)malloc((newTable->capacity) * sizeof(struct chain *))) == NULL) {
+    if ((buckets = (struct chain **)malloc((newTable->capacity) *
+                                            sizeof(struct chain *))) == NULL) {
         /* Handle failure to allocate memory */
     }
 

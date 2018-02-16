@@ -22,5 +22,7 @@
 #define HDECODE_H
 
 void decodeMessage(int infd, int outfd, struct node *htree);
+void cleanup(int infd, int outfd, int *charFreqTable, struct node *htree,
+    int mode);
 int main(int argc, char **argv);
 #endif
