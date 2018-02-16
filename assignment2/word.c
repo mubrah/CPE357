@@ -35,7 +35,6 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
         if ('A' < c && c < 'Z') {
             c += 32; 
         }
-
         if (feof(file)) {
             break;
         } else {
@@ -48,7 +47,7 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
                 stringBuffer += bufferSize;
             }
 
-            if (isalpha(c) && c != '\0') {
+            if (isalpha(c)) {
                 *stringBuffer = c;
                 stringBuffer++;
                 bufferSize++;

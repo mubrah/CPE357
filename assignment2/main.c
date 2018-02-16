@@ -45,15 +45,19 @@ int main(int argc, char **argv) {
         }
     }
 
-    struct hashTable *table = makeHashTable(); 
-    FILE *file = NULL;
-    for (idx = 0; idx < fnIdx; idx++) {
-        if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
-            fprintf(stderr, "%s: No such file or directory\n",
-                    argv[filenameIdxs[idx]]);
+    struct hashTable *table = makeHashTable();
+    if (fnIdx < 0) {
+        FILE *file = NULL;
+        for (idx = 0; idx < fnIdx; idx++) {
+            if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
+                fprintf(stderr, "%s: No such file or directory\n",
+                        argv[filenameIdxs[idx]]);
+            }
+            table = countWords(file, table);
+            fclose(file);
         }
-        table = countWords(file, table);
-        fclose(file);
+    } else {        /* stdin */
+        table = countWords(stdin, table);
     }
 
     int totalWords = 0;
