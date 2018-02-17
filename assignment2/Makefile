@@ -4,7 +4,7 @@ SOURCES = main.c hash.c word.c
 OBJECTS = main.o hash.o word.o
 .PHONY: clean
 
-main : $(OBJECTS)
+fw : $(OBJECTS)
 	$(CC) $(CFLAGS) -o fw $(OBJECTS)
 
 main.o: main.c main.h

@@ -21,14 +21,16 @@ void freeWordCount(struct wordCount *word) {
 }
 
 struct hashTable *countWords(FILE *file, struct hashTable *table) {
-    char *stringBuffer;
+    char *wordBuffer = NULL;
+    char *_wordBuffer = NULL;
     int bufferLength = 256;
     int bufferSize = 0;
 
-    if ((stringBuffer = (char *)malloc(bufferLength *
-        sizeof(*stringBuffer))) == NULL) {
+    if ((wordBuffer = (char *)malloc(bufferLength *
+        sizeof(*wordBuffer))) == NULL) {
         /* Handle failure to allocate memory */
     }
+    _wordBuffer = wordBuffer;
 
     while (1) {
         char c = fgetc(file);
@@ -40,32 +42,33 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
         } else {
             if (bufferSize == bufferLength) {
                 bufferLength *= 2;
-                if ((stringBuffer = (char *)realloc(stringBuffer-bufferSize,
+                if ((wordBuffer = (char *)realloc(wordBuffer-bufferSize,
                     bufferLength)) == NULL) {
                     /* Handle failure to allocate memory */
                 }
-                stringBuffer += bufferSize;
             }
 
             if (isalpha(c)) {
-                *stringBuffer = c;
-                stringBuffer++;
+                *_wordBuffer = c;
+                _wordBuffer++;
                 bufferSize++;
             } else {
                 if (bufferSize > 0) {
                     int i;
 
-                    *stringBuffer = '\0';
-                    stringBuffer -= bufferSize;
-                    table = insertHashTable(table, stringBuffer);
-                    for (i = 0; stringBuffer[i]; i++) {
-                        stringBuffer[i] = '\0';
+                    *_wordBuffer = '\0';
+                    table = insertHashTable(table, wordBuffer);
+                    for (i = 0; wordBuffer < bufferLength; i++) {
+                        wordBuffer[i] = '\0';
                     }
+
+                    /* Reset buffer write poitner and buffer size */ 
                     bufferSize = 0;
+                    _wordBuffer = wordBuffer;
                 }
             } 
         }
     }
-    free(stringBuffer);
+    free(wordBuffer);
     return table;
 }
