@@ -4,7 +4,7 @@ int cmpWordCount(const void *_wc1, const void *_wc2) {
     struct wordCount *wc1 = *(const struct wordCount **)_wc1;
     struct wordCount *wc2 = *(const struct wordCount **)_wc2;
     if (wc1->count == wc2->count) {
-        return strcmp(wc1->string, wc2->string);
+        return strcmp(wc2->string, wc1->string);
     } else {
         return wc2->count - wc1->count;
     }
@@ -49,9 +49,10 @@ int main(int argc, char **argv) {
     if (fnIdx > 0) {
         FILE *file = NULL;
         for (idx = 0; idx < fnIdx; idx++) {
-            if ((file = fopen(argv[filenameIdxs[idx]], "rb")) == NULL) {
+            if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
                 fprintf(stderr, "%s: No such file or directory\n",
                         argv[filenameIdxs[idx]]);
+                continue;
             } else {
                 if (table == NULL) {
                     table = makeHashTable();
@@ -72,6 +73,7 @@ int main(int argc, char **argv) {
     int totalWords = 0;
     int _wordCounter = 0;
     struct wordCount *words[table->uniqCount];
+    int minWords;
     for (idx = 0; idx < table->capacity; idx++) {
         if (table->buckets[idx] != NULL) {
             struct chain *_buckets = table->buckets[idx];
@@ -84,7 +86,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    int minWords = table->uniqCount < numWords ? table->uniqCount : numWords;
+    minWords = table->uniqCount < numWords ? table->uniqCount : numWords;
     printf("The top %i words (out of %i) are:\n",
            numWords, table->uniqCount);
     qsort(words, table->uniqCount, sizeof(struct wordCount *), cmpWordCount);

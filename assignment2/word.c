@@ -45,8 +45,8 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
                 if ((wordBuffer = (char *)realloc(wordBuffer,
                     bufferLength)) == NULL) {
                     /* Handle failure to allocate memory */
-                    _wordBuffer = wordBuffer + bufferSize;
                 }
+                _wordBuffer = wordBuffer + bufferSize;
             }
 
             if (isalpha(c)) {
@@ -60,7 +60,7 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
                     *_wordBuffer = '\0';
                     table = insertHashTable(table, wordBuffer);
                     for (i = 0; i < bufferLength; i++) {
-                        _wordBuffer[i] = '\0';
+                        wordBuffer[i] = '\0';
                     }
 
                     /* Reset buffer write poitner and buffer size */ 
