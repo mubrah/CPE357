@@ -1,6 +1,5 @@
 #include "htable.h"
 
-#define DEBUG
 
 void appendString(char *existing, char *toAppend, char *buffer) {
     int lenExisting = 0;
