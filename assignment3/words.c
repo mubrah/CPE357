@@ -103,44 +103,38 @@ struct node **createHNodeStack(int *charFreq) {
         }
     }
     sortHNodeFreq(HNodeStack, stackSize);
-    return HNodeStack;          /* MUST Free Stack */
+    return HNodeStack;          /* MUST Free Stack Container */
 }
 
 struct node *createHTree(int *charFreq) {
     int i = 0;
-    int j = 1;
     int stackSize = charFreq[NUMCHAR];
     char *string = NULL;
     struct node *htree = NULL;
     struct node **hnodeStack = NULL;
+    struct node **_hnodeStack = NULL;
     struct node *newNode = NULL;
 
     hnodeStack = createHNodeStack(charFreq);
-    while (hnodeStack[1] != NULL) {
+    _hnodeStack = hnodeStack;
+    while (i < stackSize - 1) { /* Run until 1 item left in the stack */
         if ((string = malloc(sizeof(*string) * strlen(hnodeStack[0]->string) +
                                 strlen(hnodeStack[1]->string) + 1)) == NULL) {
             /* Handle Null */
         }
-        strcpy(string, hnodeStack[0]->string);
-        newNode = createNode(strcat(string, hnodeStack[1]->string),
-                             hnodeStack[0]->freq + hnodeStack[1]->freq,
+        strcpy(string, _hnodeStack[0]->string);
+        strcat(string, _hnodeStack[1]->string);
+        newNode = createNode(string,
+                             _hnodeStack[0]->freq + _hnodeStack[1]->freq,
                              NULL,
-                             hnodeStack[0],
-                             hnodeStack[1]);
-        hnodeStack[0] = newNode;
-
-        /* Rebuild stack by moving all elements up a position */
-        for (i = 1; i < stackSize; i++) {
-            if (i == stackSize - 1) {
-                hnodeStack[i] = NULL;
-            } else {
-                hnodeStack[i] = hnodeStack[i + 1];
-            }
-        }
-        sortHNodeFreq(hnodeStack, stackSize - j);
-        j++;
+                             _hnodeStack[0],
+                             _hnodeStack[1]);
+        _hnodeStack[1] = newNode;
+        _hnodeStack++;
+        i++;
+        sortHNodeFreq(_hnodeStack, stackSize - i);
     }
-    htree = hnodeStack[0];
+    htree = *_hnodeStack;
     free(hnodeStack);
     return htree;       /* MUST Free htree */
 }
