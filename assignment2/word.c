@@ -58,8 +58,8 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
 
                     *_wordBuffer = '\0';
                     table = insertHashTable(table, wordBuffer);
-                    for (i = 0; wordBuffer < bufferLength; i++) {
-                        wordBuffer[i] = '\0';
+                    for (i = 0; i < bufferLength; i++) {
+                        _wordBuffer[i] = '\0';
                     }
 
                     /* Reset buffer write poitner and buffer size */ 
