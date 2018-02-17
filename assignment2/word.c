@@ -45,6 +45,7 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
                 if ((wordBuffer = (char *)realloc(wordBuffer,
                     bufferLength)) == NULL) {
                     /* Handle failure to allocate memory */
+                    _wordBuffer = wordBuffer + bufferSize;
                 }
             }
 

@@ -45,19 +45,28 @@ int main(int argc, char **argv) {
         }
     }
 
-    struct hashTable *table = makeHashTable();
+    struct hashTable *table = NULL;
     if (fnIdx > 0) {
         FILE *file = NULL;
         for (idx = 0; idx < fnIdx; idx++) {
-            if ((file = fopen(argv[filenameIdxs[idx]], "r")) == NULL) {
+            if ((file = fopen(argv[filenameIdxs[idx]], "rb")) == NULL) {
                 fprintf(stderr, "%s: No such file or directory\n",
                         argv[filenameIdxs[idx]]);
+            } else {
+                if (table == NULL) {
+                    table = makeHashTable();
+                }
+                table = countWords(file, table);
+                fclose(file);
             }
-            table = countWords(file, table);
-            fclose(file);
         }
     } else {        /* stdin */
         table = countWords(stdin, table);
+    }
+    
+    /* Check if all input files were invalid b/c no table was created */
+    if (table == NULL) {
+        exit(1);
     }
 
     int totalWords = 0;
