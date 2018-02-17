@@ -69,6 +69,7 @@ int main(int argc, char **argv) {
     
     /* Check if all input files were invalid b/c no table was created */
     if (table == NULL) {
+        printf("The top %i words (out of 0) are:\n", numWords);
         exit(1);
     }
 
