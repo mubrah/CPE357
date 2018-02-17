@@ -14,6 +14,10 @@
 #include "htable.h"
 #endif
 
+#ifndef TREE_H
+#include "tree.h"
+#endif
+
 #ifndef HDECODE_H
 #define HDECODE_H
 

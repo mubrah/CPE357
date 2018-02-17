@@ -41,7 +41,10 @@ void decodeMessage(int infd, int outfd, struct node *htree) {
                 }
             }
         } else {
-            /* write(outfd, &writeBuffer, 1); */
+            _htree = find(writeBuffer, htree);
+            if (_htree->freq > 0) {
+                write(outfd, &writeBuffer, 1);
+            }
         }
     }
 }

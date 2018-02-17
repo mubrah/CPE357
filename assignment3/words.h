@@ -19,7 +19,6 @@
 
 #define NUMCHAR 128     /* 128 characters in ASCII */
 
-
 int *countChars(int fd);
 void sortHNodeFreq(struct node **nodeStack, int stackSize);
 void sortHNodeChar(struct node **nodeList, int stackSize);
