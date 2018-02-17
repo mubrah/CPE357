@@ -46,11 +46,13 @@ void sortHNodeFreq(struct node **nodeStack, int stackSize) {
                 nodeStack[j] = temp;
             }
             if (nodeStack[j - 1]->freq == nodeStack[j]->freq) {
+                /*
                 if (nodeStack[j - 1]->string[0] > nodeStack[j]->string[0]) {
                     struct node *temp = nodeStack[j - 1];
                     nodeStack[j - 1] = nodeStack[j];
                     nodeStack[j] = temp;
                 }
+                */
             }
             j--;
         }
