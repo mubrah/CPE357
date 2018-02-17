@@ -121,7 +121,8 @@ struct node *createHTree(int *charFreq) {
     _hnodeStack = hnodeStack;
     while (i < stackSize - 1) { /* Run until 1 item left in the stack */
         if ((string = malloc(sizeof(*string) *
-            strlen(hnodeStack[0]->string) + strlen(hnodeStack[1]->string) + 1))
+            strlen(_hnodeStack[0]->string) +
+            strlen(_hnodeStack[1]->string) + 1))
                 == NULL) {
             /* Handle NULL */
         }

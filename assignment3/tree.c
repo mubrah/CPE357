@@ -17,7 +17,6 @@ struct node *createNode(char *string, int freq, char *code, struct node *left,
 }
 
 void freeNode(struct node *node) {
-    write(1, "%s | %i | %s | %p | %p\n", node->string, node->freq, node->code, node->left, node->right, 80);
     if (node != NULL) {
         if (node->string != NULL)
             free(node->string);
