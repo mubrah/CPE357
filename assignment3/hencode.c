@@ -54,12 +54,12 @@ int main(int argc, char **argv) {
     struct HTable *htable = NULL;
 
     if (argc == 1) {
-        perror("usage: ./hencode infile [ outfile ]\n");
+        write(2, "usage: ./hencode infile [ outfile ]\n", 80);
         return 1;
     }
     infd = open(argv[1], O_RDONLY);
     if (infd == -1) {
-        perror(argv[1]);
+        write(2, argv[1], strlen(argv[1]));
         exit(1);
     }
     if (argc == 2) {
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
         umask(022);
         outfd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (outfd == -1) {
-            perror(argv[2]);
+            write(2, argv[2], strlen(argv[2]));
             exit(1);
         }
     }
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
     infd = open(argv[1], O_RDONLY);
 
     if (infd == -1) {
-        perror(argv[1]);
+        write(2, argv[1], strlen(argv[1]));
         exit(1);
     }
 

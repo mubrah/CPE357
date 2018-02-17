@@ -69,7 +69,7 @@ int *readHeader(int fd) {
 
     if (numChars == 0) {        /* Empty File Scenario */
         if ((charFreq = calloc(1, sizeof(*charFreq))) == NULL) {
-            /* Handle Null */
+            /* Handle NULL */
         }
         *charFreq = -1;
         return charFreq;
@@ -81,7 +81,7 @@ int *readHeader(int fd) {
      * 129  : Total number of chars counted
      */
     if ((charFreq = calloc(NUMCHAR + 2, sizeof(*charFreq))) == NULL) {
-        /* Handle Null */
+        /* Handle NULL */
     }
     charFreq[NUMCHAR] = numChars;
 

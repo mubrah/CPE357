@@ -1,7 +1,3 @@
-#ifndef _STDIO_H_
-#include <stdio.h>
-#endif
-
 #ifndef _SYS_TYPES_H_
 #include <sys/types.h>
 #endif

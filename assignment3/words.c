@@ -15,7 +15,7 @@ int *countChars(int fd) {
      * 129  : Total number of chars counted
      */
     if ((charFreq = calloc(NUMCHAR + 2, sizeof(*charFreq))) == NULL) {
-        /* Handle Null */
+        /* Handle NULL */
     }
 
     while (retRead > 0) {
@@ -87,7 +87,7 @@ struct node **createHNodeStack(int *charFreq) {
     if ((HNodeStack = malloc(sizeof(*HNodeStack) * stackSize)) != NULL) {
         _HNodeStack = HNodeStack;
     } else {
-        /* Handle Null */
+        /* Handle NULL */
     }
 
     for (i = 0; i < NUMCHAR; i++) {
@@ -98,7 +98,7 @@ struct node **createHNodeStack(int *charFreq) {
                 string[0] = (char)i;
                 string[1] = '\0';
             } else {
-                /* Handle Null */ 
+                /* Handle NULL */
             }
             *_HNodeStack = createNode(string, charFreq[i], NULL, NULL, NULL);
             _HNodeStack++;
@@ -120,9 +120,10 @@ struct node *createHTree(int *charFreq) {
     hnodeStack = createHNodeStack(charFreq);
     _hnodeStack = hnodeStack;
     while (i < stackSize - 1) { /* Run until 1 item left in the stack */
-        if ((string = malloc(sizeof(*string) * strlen(hnodeStack[0]->string) +
-                                strlen(hnodeStack[1]->string) + 1)) == NULL) {
-            /* Handle Null */
+        if ((string = malloc(sizeof(*string) *
+            strlen(hnodeStack[0]->string) + strlen(hnodeStack[1]->string) + 1))
+                == NULL) {
+            /* Handle NULL */
         }
         strcpy(string, _hnodeStack[0]->string);
         strcat(string, _hnodeStack[1]->string);

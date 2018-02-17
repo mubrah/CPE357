@@ -91,7 +91,7 @@ struct HTable *getHTable(int fd) {
         /* Handle NULL */
     }
     if (totalChars == 0) {                  /* Empty file scenatio */
-        leafNodes[0] = htree;                  /* htree is NULL */
+        leafNodes[0] = htree;               /* htree is NULL */
     } else if (numNodes == 1) {             /* 1 char file scenario */
         leafNodes[0] = htree;
     } else {                                /* Everything else */
