@@ -64,8 +64,8 @@ struct hashTable *countWords(FILE *file, struct hashTable *table) {
                     }
 
                     /* Reset buffer write poitner and buffer size */ 
-                    bufferSize = 0;
                     _wordBuffer = wordBuffer;
+                    bufferSize = 0;
                 }
             } 
         }

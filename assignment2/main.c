@@ -61,7 +61,8 @@ int main(int argc, char **argv) {
                 fclose(file);
             }
         }
-    } else {        /* stdin */
+    } else if (fnIdx == 0) {        /* stdin */
+        table = makeHashTable();
         table = countWords(stdin, table);
     }
     
