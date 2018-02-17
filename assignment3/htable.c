@@ -1,5 +1,7 @@
 #include "htable.h"
 
+#define DEBUG
+
 void appendString(char *existing, char *toAppend, char *buffer) {
     int lenExisting = 0;
     if (existing != NULL) {
@@ -96,6 +98,15 @@ struct HTable *getHTable(int fd) {
     } else {                                /* Everything else */
         getCodes(htree, leafNodes, NULL);
         sortHNodeChar(leafNodes, numNodes);
+
+        #ifdef DEBUG
+        #include <stdio.h>
+        int i;
+        for (i = 0; i < numNodes; i++) {
+            printf("0x%02x: %s\n", (char)leafNodes[i]->string[0], leafNodes[i]->code);
+        }
+        #endif
+
     }
     
     if ((htable = malloc(sizeof(*htable))) == NULL) {
