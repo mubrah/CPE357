@@ -103,7 +103,8 @@ struct HTable *getHTable(int fd) {
         #include <stdio.h>
         int i;
         for (i = 0; i < numNodes; i++) {
-            printf("0x%02x: %s\n", (char)leafNodes[i]->string[0], leafNodes[i]->code);
+            printf("0x%02x: %s\n", (char)leafNodes[i]->string[0],
+                                         leafNodes[i]->code);
         }
         #endif
 
