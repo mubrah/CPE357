@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
                     debugMode = 1;
                     break;
                 default:
-                    fprintf(stderr, "fw: Invalid options given\n");
+                    fprintf(stderr,
+                            "usage: fw [-n num] [ file1 [ file 2 ...] ]\n");
                     return 1;
                     break;
             }
