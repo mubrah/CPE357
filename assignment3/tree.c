@@ -10,7 +10,8 @@ int stringContains(char this, char *string) {
 }
 
 struct node *find(char this, struct node *htree) {
-    if (htree->string[0] == this) {
+    if ((*htree->string == this) &&
+            (htree->left ==NULL) && (htree->right == NULL)) {
         return htree;
     } else {
         if (stringContains(this, htree->left->string)) {
