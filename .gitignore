@@ -1,5 +1,10 @@
 .vscode/
 
+# Ignore Project Executables
+fw
+hencode
+hdecode
+
 # Prerequisites
 *.d
 
