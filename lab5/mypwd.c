@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -30,14 +31,18 @@ void traverse(int depth) {
         upDir[3 + 3*i + 2] = '/';
     }
 
-    /* Open current directory file at specified depth above this level */
-    dir = opendir(upDir);
-    stat(currentDir, &fileStat);
-
+    if (chdir(currentDir) >= 0) {
+        dir = opendir("../");
+        stat(".", &fileStat);        
+    } else {
+        /* Open current directory file at specified depth above this level */
+        dir = opendir(upDir);
+        stat(currentDir, &fileStat);
+    }
 
     if (dir == NULL) {
         printf("Cannot open directory: %s\n", upDir);
-        perror("Poop");
+        perror("Darnit!");
         return;
     } else {
         while (ep = readdir(dir)) {
