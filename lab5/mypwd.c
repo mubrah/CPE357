@@ -2,6 +2,8 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
+void traverse(int depth);
+
 void traverse(int depth) {
     char currentDir[2 + 3 * depth];
     char upDir[3 + 3 * depth];
@@ -35,7 +37,8 @@ void traverse(int depth) {
 
     if (dir == NULL) {
         printf("Cannot open directory: %s\n", upDir);
-        return 0;
+        perror("Poop");
+        return;
     } else {
         while (ep = readdir(dir)) {
             if (fileStat.st_ino == ep->d_ino) {
@@ -45,10 +48,8 @@ void traverse(int depth) {
         }
         closedir(dir);
     }
-    return 0;
 }
 
 int main(int argc, char **argv) {
-    char *pathName = malloc(sizeof(*pathName) * 256);
     traverse(0);
 }
