@@ -9,9 +9,10 @@
 int traverseDir(char **path, int depth, int maxDepth);
 
 int traverseDir(char **path, int depth, int maxDepth) {
-    DIR *dir;
+    DIR *upDir;
     struct dirent *ep = NULL;
-    struct stat fileStat;
+    struct stat dotStat;
+    struct stat epStat;
     struct stat rootCheckCurrent;
     struct stat rootCheckUp;
     char *dirName = NULL;
@@ -22,32 +23,35 @@ int traverseDir(char **path, int depth, int maxDepth) {
         exit(1);
     }
 
-    if (path[0] != NULL) {
-        chdir("../");
-    }
-    dir = opendir("../");
-    stat("./", &fileStat);
 
-    if (dir == NULL) {
+    upDir = opendir("..");
+    stat(".", &dotStat);
+
+    if (upDir == NULL) {
         perror("mypwd");
         return -1;
     } else {
-        stat("./", &rootCheckCurrent);
-        stat("../", &rootCheckUp);
+        stat(".", &rootCheckCurrent);
+        stat("..", &rootCheckUp);
         if (rootCheckCurrent.st_ino == rootCheckUp.st_ino) {
-            closedir(dir);
+            closedir(upDir);
             return depth;
         } else {
-            while ((ep = readdir(dir))) {
-                if (fileStat.st_ino == ep->d_ino) {
-                    dirName = malloc(sizeof(*dirName) * strlen(ep->d_name));
-                    strcpy(dirName, ep->d_name);
-                    path[depth] = dirName;
-                    ret = traverseDir(path, depth + 1, maxDepth);
+            chdir("..");
+            while ((ep = readdir(upDir))) {
+                if (strcmp(ep->d_name, ".") != 0) {
+                    stat(ep->d_name, &epStat);
+                    if (dotStat.st_ino == epStat.st_ino) {
+                        dirName = malloc(sizeof(*dirName) * strlen(ep->d_name));
+                        strcpy(dirName, ep->d_name);
+                        path[depth] = dirName;
+                        ret = traverseDir(path, depth + 1, maxDepth);
+                        break;
+                    } 
                 }
             }
         }
-        closedir(dir);
+        closedir(upDir);
         return ret ? ret : depth;
     }
 }
