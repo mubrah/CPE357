@@ -67,6 +67,8 @@ int main(int argc, char **argv) {
         } else {
             printf("%s\n", path[i]);
         }
+        free(path[i]);
     }
+    free(path);
     return 0;
 }
