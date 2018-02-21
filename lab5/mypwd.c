@@ -1,60 +1,72 @@
 #include <unistd.h>
+#include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <string.h>
+#include <linux/limits.h>
 
-void traverse(int depth);
+int traverseDir(char **path, int depth, int maxDepth);
 
-void traverse(int depth) {
-    char currentDir[2 + 3 * depth];
-    char upDir[3 + 3 * depth];
+int traverseDir(char **path, int depth, int maxDepth) {
     DIR *dir;
     struct dirent *ep = NULL;
     struct stat fileStat;
-    int i;
+    struct stat rootCheckCurrent;
+    struct stat rootCheckUp;
+    char *dirName = NULL;
+    int ret;
 
-    /* Set up traversal path based on depth */
-    currentDir[0] = '.';
-    currentDir[1] = '/';
-
-    upDir[0] = '.';
-    upDir[1] = '.';
-    upDir[2] = '/';
-
-    for (i = 0; i < depth; i++) {
-        currentDir[2 + 3*i + 0] = '.';
-        currentDir[2 + 3*i + 1] = '.';
-        currentDir[2 + 3*i + 2] = '/';
-
-        upDir[3 + 3*i + 0] = '.';
-        upDir[3 + 3*i + 1] = '.';
-        upDir[3 + 3*i + 2] = '/';
+    if (depth == maxDepth) {
+        fprintf(stderr, "path too long");
+        exit(1);
     }
 
-    if (chdir(currentDir) >= 0) {
-        dir = opendir("../");
-        stat(".", &fileStat);        
-    } else {
-        /* Open current directory file at specified depth above this level */
-        dir = opendir(upDir);
-        stat(currentDir, &fileStat);
+    if (path[0] != NULL) {
+        chdir("../");
     }
+    dir = opendir("../");
+    stat("./", &fileStat);
 
     if (dir == NULL) {
-        printf("Cannot open directory: %s\n", upDir);
-        perror("Darnit!");
-        return;
+        perror("mypwd");
+        return -1;
     } else {
-        while (ep = readdir(dir)) {
-            if (fileStat.st_ino == ep->d_ino) {
-                printf("%s\n", ep->d_name);
-                traverse(depth+1);
+        stat("./", &rootCheckCurrent);
+        stat("../", &rootCheckUp);
+        if (rootCheckCurrent.st_ino == rootCheckUp.st_ino) {
+            closedir(dir);
+            return depth;
+        } else {
+            while ((ep = readdir(dir))) {
+                if (fileStat.st_ino == ep->d_ino) {
+                    dirName = malloc(sizeof(*dirName) * strlen(ep->d_name));
+                    strcpy(dirName, ep->d_name);
+                    path[depth] = dirName;
+                    ret = traverseDir(path, depth + 1, maxDepth);
+                }
             }
         }
         closedir(dir);
+        return ret;
     }
 }
 
 int main(int argc, char **argv) {
-    traverse(0);
+    char **path = NULL;
+    int depth, maxPath, i;
+    
+    maxPath = PATH_MAX ? PATH_MAX : 2048;
+    path = calloc(maxPath, sizeof(*path));
+    depth = traverseDir(path, 0, maxPath);
+
+    printf("/");
+    for (i = depth - 1; i >= 0; i--) {
+        if (i > 0) {
+            printf("%s/", path[i]);    
+        } else {
+            printf("%s\n", path[i]);
+        }
+    }
+    return 0;
 }
