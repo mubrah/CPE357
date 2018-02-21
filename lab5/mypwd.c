@@ -48,7 +48,7 @@ int traverseDir(char **path, int depth, int maxDepth) {
             }
         }
         closedir(dir);
-        return ret;
+        return ret ? ret : depth;
     }
 }
 
