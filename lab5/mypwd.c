@@ -42,7 +42,7 @@ int traverseDir(char **path, int depth, int maxDepth) {
                 if (strcmp(ep->d_name, ".") != 0) {
                     stat(ep->d_name, &epStat);
                     if (dotStat.st_ino == epStat.st_ino) {
-                        dirName = malloc(sizeof(*dirName) * strlen(ep->d_name));
+                        dirName = malloc(sizeof(*dirName) * (strlen(ep->d_name) + 1));
                         strcpy(dirName, ep->d_name);
                         path[depth] = dirName;
                         ret = traverseDir(path, depth + 1, maxDepth);
