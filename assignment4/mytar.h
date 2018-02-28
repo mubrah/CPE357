@@ -2,22 +2,10 @@
 #include <stdio.h>
 #endif
 
-#ifndef _STRING_H_
-#include <string.h>
-#endif
-
-#include <sys/stat.h>
-
-#ifndef _PWD_H_
-#include <pwd.h>
-#endif
-
-#ifndef _GRP_H
-#include <grp.h>
-#endif
-
 #ifndef MYTAR_H
 #define MYTAR_H
+
+#define TBLOCKSIZE 512
 
 /* tar Header Block, from POSIX 1003.1-1990.  */
 
@@ -43,7 +31,7 @@ struct tarHeader {              /* byte offset */
   char padding[12];             /* 500 */
 };
 
-#define TMAGIC   "ustar"        /* ustar and a null */
+#define TMAGIC   "ustar\0"      /* ustar and a null */
 #define TMAGLEN  6
 #define TVERSION "00"           /* 00 and no null */
 #define TVERSLEN 2
@@ -58,10 +46,6 @@ struct tarHeader {              /* byte offset */
 #define DIRTYPE  '5'            /* directory */
 #define FIFOTYPE '6'            /* FIFO special */
 #define CONTTYPE '7'            /* reserved */
-
-#define XHDTYPE  'x'            /* Extended header referring to the
-                                   next file in the archive */
-#define XGLTYPE  'g'            /* Global extended header */
 
 
 #endif
