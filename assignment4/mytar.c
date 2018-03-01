@@ -2,9 +2,9 @@
 #include "archive.h"
 #include "extract.h"
 
-char getOption(char *options) {
+unsigned char getOption(char *options) {
     int c=0, t=0, x=0, f=0, i=0;
-    char ret = NULL;
+    unsigned char ret;
     for (i = 0; i < strlen(options); i++) {
         switch (options[i]) {
             case 'c':
@@ -21,15 +21,15 @@ char getOption(char *options) {
                 break;
             default:
                 fprintf(stderr, "unrecognized option '%c'.\n", options[i]);
-                return NULL;
+                return '\0';
         }
     }
     if (c + t + x > 1) {            /* Multiple options were given */
         fprintf(stderr, "you may only choose one of the 'ctx' options.\n");
-        return NULL;
+        return '\0';
     } else if (c + t + x == 0) {   /* Only f was given */
         fprintf(stderr, "you must choose one of the 'ctx' options.\n");
-        return NULL;
+        return '\0';
     } else {
         if (c > 0) {
             ret = 'c';
@@ -49,13 +49,13 @@ char getOption(char *options) {
 int main(int argc, char **argv) {
     FILE *archive;
     char usage[] = "usage: mytar <c | t | x>[v]f tarfile [path [...]]\n";
-    char operation;
+    unsigned char operation;
     int i = 0;
 
     if (argc < 2) {
         fprintf(stderr, usage);
         return 1;
-    } else if ((operation = getOption(argv[1])) == NULL) {
+    } else if ((operation = getOption(argv[1])) == '\0') {
         fprintf(stderr, usage);
         return 1;
     } else {

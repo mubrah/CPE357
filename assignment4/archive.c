@@ -13,7 +13,7 @@ int writeHeader(char *finputName, FILE *archive) {
     strcpy(header.name, finputName);
 
     if (stat(finputName, &statBuf) < 0) {
-        perror("Could not stat argv[1]");
+        fprintf(stderr, "Could not stat %s\n", finputName);
         return 0;
     }
     
