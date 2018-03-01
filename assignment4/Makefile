@@ -5,7 +5,7 @@ SOURCES = mytar.c archive.c extract.c
 .PHONY: clean
 
 mytar : $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) -o mytar $(SOURCES)
+	$(CC) $(CFLAGS) -o mytar $(SOURCES) -lm
 
 clean:
 	rm -f *.o test.tar output
