@@ -53,15 +53,10 @@ int extractFile(char *foutputName, FILE *archive, struct tarHeader *header) {
     }
     fwrite(readBuf, expectedSize - writtenSize, 1, foutput);
     memset(readBuf, 0, TBLOCKSIZE);
-    /* Advance the tar 2 data blocks */
+    /* Advance the tar 2 data blocks and close */
     fread(readBuf, TBLOCKSIZE, 1, archive);
     fread(readBuf, TBLOCKSIZE, 1, archive);
-
-
     fclose(foutput);
-
-
-
 
     /* Set up file modes, owners, etc */ 
     int mode = octalStr2Int(header->mode);
@@ -74,10 +69,12 @@ int extractFile(char *foutputName, FILE *archive, struct tarHeader *header) {
         /* ferror("Could not chown file\n"); */ 
     } 
 
-
-
     return 1; 
 }
 
-int extractFile(char *foutputName, FILE *archive, struct tarHeader *header) {
+int extractData(char *foutputName, FILE *archive, struct tarHeader *header) {
+    if (header->typeflag == '0') {
+        return extractFile(foutputName, archive, header);
+    }
+    return 0;
 }
