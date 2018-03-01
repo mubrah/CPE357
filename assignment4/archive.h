@@ -1,14 +1,28 @@
-#ifndef _STDIO_H_
+#ifndef _STDIO_H
 #include <stdio.h>
 #endif
 
-#ifndef _STRING_H_
+#ifndef _STDLIB_H
+#include <stdlib.h>
+#endif
+
+#ifndef _STRING_H
 #include <string.h>
 #endif
 
-#include <sys/stat.h>
+#ifndef _SYS_TYPES_H
+#include <sys/types.h>
+#endif
 
-#ifndef _PWD_H_
+#ifndef _SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#ifndef _UNISTD_H
+#include <unistd.h>
+#endif
+
+#ifndef _PWD_H
 #include <pwd.h>
 #endif
 
@@ -25,4 +39,5 @@
 
 int writeHeader(char *finputName, FILE *archive);
 int archiveData(char *finputName, FILE *archive);
+int createArchive(int argc, char **argv);
 #endif

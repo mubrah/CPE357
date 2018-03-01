@@ -1,22 +1,24 @@
-#ifndef _STDIO_H_
+#ifndef _STDIO_H
 #include <stdio.h>
 #endif
 
-#ifndef _MATH_H_
+#ifndef _MATH_H
 #include <math.h>
 #endif
 
-#ifndef _STRING_H_
+#ifndef _STRING_H
 #include <string.h>
 #endif
 
+#ifndef _SYS_STAT_H
 #include <sys/stat.h>
+#endif
 
-#ifndef _UNISTD_H_
+#ifndef _UNISTD_H
 #include <unistd.h>
 #endif
 
-#ifndef _PWD_H_
+#ifndef _PWD_H
 #include <pwd.h>
 #endif
 

@@ -70,12 +70,7 @@ int main(int argc, char **argv) {
         }
         
         if (operation == 'c' + 'f') {
-            archive = fopen(argv[2], "wb");
-            for (i = 3; i < argc; i++) {
-                writeHeader(argv[i], archive);
-                archiveData(argv[i], archive);
-            }
-            fclose(archive);
+            return createArchive(argc, argv);
         } 
         if (operation == 't' + 'f') {
             return 1;

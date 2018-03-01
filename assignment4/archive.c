@@ -86,10 +86,81 @@ int archiveData(char *finputName, FILE *archive) {
         }
     }
     fwrite(readBuf, TBLOCKSIZE, 1, archive);
-    memset(readBuf, 0, TBLOCKSIZE);
-    fwrite(readBuf, TBLOCKSIZE, 1, archive);
-    fwrite(readBuf, TBLOCKSIZE, 1, archive);
     
     fclose(finput);
     return 1;
+}
+
+char *appendStr(char *base, char *toAppend) {
+    char *newStr = NULL;
+    char *_newStr = NULL;
+    int len = strlen(base) + strlen(toAppend) + 1;
+
+    newStr = calloc(len, sizeof(*newStr));
+    _newStr = newStr + strlen(base);
+    strcpy(newStr, base);
+    strcpy(_newStr, toAppend);
+    return newStr;
+}   /* Must free new string */
+
+char *fixDirName(char *origDirName) {
+    char *fixedDirName = NULL;
+
+    if (origDirName[strlen(origDirName) - 1] != '/') {
+        fixedDirName = appendStr(origDirName, "/");
+    } else {
+        fixedDirName = malloc(sizeof(*fixedDirName) * (strlen(origDirName) + 1));
+        strcpy(fixedDirName, origDirName);
+    }
+    return fixedDirName;
+}   /* Must free fixedDirName */
+
+char *prependDir() {
+    
+}
+
+int createArchive(int argc, char **argv) {
+    FILE *archive;
+    char emptyBlock[TBLOCKSIZE] = {0};
+    int i;
+
+    archive = fopen(argv[2], "wb");
+    for (i = 3; i < argc; i++) {
+        struct stat statBuf;
+
+        writeHeader(argv[i], archive);
+        stat(argv[i], &statBuf);
+        if (S_ISREG(statBuf.st_mode) > 0) {
+            archiveData(argv[i], archive);
+        } else if (S_ISDIR(statBuf.st_mode) > 0) {
+            DIR *dir = NULL;
+            struct dirent *dirEntry = NULL;
+            struct stat dirstatBuf;
+            struct stat curstatBuf;
+            char *dirName = NULL;
+            char *fileName = NULL;
+
+            dirName = fixDirName(argv[i]);
+            
+            dir = opendir(dirName);
+            stat(".", &curstatBuf);
+            stat(dirName, &dirstatBuf);
+            while ((dirEntry = readdir(dir))) {
+                if ((dirEntry->d_ino != dirstatBuf.st_ino) &&
+                    (dirEntry->d_ino != curstatBuf.st_ino)) {
+                        fileName = appendStr(dirName, dirEntry->d_name);
+                        writeHeader(fileName, archive);
+                        archiveData(fileName, archive);
+                        free(fileName);
+                    }
+            }
+            closedir(dir);
+            free(dirName);
+        }
+    }
+
+    fwrite(emptyBlock, TBLOCKSIZE, 1, archive);
+    fwrite(emptyBlock, TBLOCKSIZE, 1, archive);
+    fclose(archive);
+    return 0;
 }

@@ -1,5 +1,21 @@
-#ifndef _STDIO_H_
+#ifndef _STDIO_H
 #include <stdio.h>
+#endif
+
+#ifndef _SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifndef _SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#ifndef _UNISTD_H
+#include <unistd.h>
+#endif
+
+#ifndef _DIRENT_H
+#include <dirent.h>
 #endif
 
 #ifndef MYTAR_H
