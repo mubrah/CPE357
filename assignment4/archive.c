@@ -139,6 +139,7 @@ int createArchive(int argc, char **argv) {
                 if ((dirEntry->d_ino != dirstatBuf.st_ino) &&
                     (dirEntry->d_ino != curstatBuf.st_ino)) {
                         fileName = appendStr(dirName, dirEntry->d_name);
+                        lstat(fileName, &statBuf);
                         writeHeader(fileName, archive, &statBuf);
                         archiveData(fileName, archive);
                         free(fileName);
