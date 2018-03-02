@@ -100,7 +100,8 @@ char *fixDirName(char *origDirName) {
     if (origDirName[strlen(origDirName) - 1] != '/') {
         fixedDirName = appendStr(origDirName, "/");
     } else {
-        fixedDirName = malloc(sizeof(*fixedDirName) * (strlen(origDirName) + 1));
+        fixedDirName = malloc(sizeof(*fixedDirName) *
+                            (strlen(origDirName) + 1));
         strcpy(fixedDirName, origDirName);
     }
     return fixedDirName;

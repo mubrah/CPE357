@@ -62,9 +62,11 @@ int main(int argc, char **argv) {
         fprintf(stderr, usage);
         return 1;
     } else {
-        if ((operation == (int)'c') || (operation == (int)'t') || (operation == (int)'x')) {
-            fprintf(stderr, "specify a tar file with the 'f' option.\n");
-            fprintf(stderr, usage);
+        if ((operation == (int)'c') ||
+            (operation == (int)'t') ||
+            (operation == (int)'x')) {
+                fprintf(stderr, "specify a tar file with the 'f' option.\n");
+                fprintf(stderr, usage);
             return 1;
         } else if (argc < 3) {
             fprintf(stderr, "option 'f' requires an archive name.\n");

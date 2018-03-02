@@ -58,8 +58,10 @@ int extractFile(FILE *archive, struct tarHeader *header, char *foutputName) {
 int extractDir(FILE *archive, struct tarHeader *header) {
     mkdir(header->name, convOctalStr(header->mode));
     
-    if (chown(header->name, convOctalStr(header->uid), convOctalStr(header->gid)) < 0) {
-        fprintf(stderr, "Could not chown %s\n", header->name); 
+    if (chown(header->name,
+        convOctalStr(header->uid),
+        convOctalStr(header->gid)) < 0) {
+            fprintf(stderr, "Could not chown %s\n", header->name); 
     } 
     return 1;
 }
@@ -68,8 +70,10 @@ int extractSym(FILE *archive, struct tarHeader *header) {
     symlink(header->linkname, header->name);
     
     chmod(header->name, convOctalStr(header->mode));
-    if (chown(header->name, convOctalStr(header->uid), convOctalStr(header->gid)) < 0) {
-        fprintf(stderr, "Could not chown %s\n", header->name); 
+    if (chown(header->name,
+        convOctalStr(header->uid),
+        convOctalStr(header->gid)) < 0) {
+            fprintf(stderr, "Could not chown %s\n", header->name); 
     } 
     return 1;
 }
