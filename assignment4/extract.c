@@ -8,7 +8,6 @@ int convOctalStr(char *octalString) {
     for (i = len - 1; i >= 0; i--) {
         res += (int)((octalString[i] - '0') * pow(8.0, (double)(len - i - 1)));
     }
-
     return res;
 }
 
@@ -17,13 +16,13 @@ int readHeader(FILE *archive, struct tarHeader *header) {
     return convOctalStr(header->chksum);
 }
 
-int extractFile(FILE *archive, struct tarHeader *header) {
+int extractFile(FILE *archive, struct tarHeader *header, char *foutputName) {
     FILE *foutput;
     char readBuf[TBLOCKSIZE] = {0};
     int expectedSize = convOctalStr(header->size);
     int writtenSize = 0;
 
-    foutput = fopen(header->name, "wb");
+    foutput = fopen(foutputName, "wb");
     
     while (fread(readBuf, TBLOCKSIZE, 1, archive)) {
         if (feof(archive)) {
@@ -52,8 +51,7 @@ int extractFile(FILE *archive, struct tarHeader *header) {
         convOctalStr(header->uid),
         convOctalStr(header->gid)) < 0) {
             fprintf(stderr, "Could not chown %s\n", header->name);
-    } 
-
+    }
     return 1; 
 }
 
@@ -83,10 +81,9 @@ int extractArchive(int argc, char **argv) {
     int ret = 0;
 
     archive = fopen(argv[2], "rb");
-
     while (readHeader(archive, &header) != 0) {
         if (header.typeflag == REGTYPE) {
-            if(!extractFile(archive, &header)) {
+            if(!extractFile(archive, &header, header.name)) {
                 fprintf(stderr, "Error extracting %s\n", header.name);
                 ret = 1;
             }
@@ -100,11 +97,27 @@ int extractArchive(int argc, char **argv) {
                 fprintf(stderr, "Error extracting %s\n", header.name);
                 ret = 1;
             }
-            
         }
     }
-        
-
     fclose(archive);
     return ret;
+}
+
+int listArchive(int argc, char **argv) {
+    FILE *archive;
+    struct tarHeader header = {0};
+    int ret = 0;
+
+    archive = fopen(argv[2], "rb");
+    while (readHeader(archive, &header) != 0) {
+        printf("%s\n", header.name);
+        if (header.typeflag == REGTYPE) {
+            if(!extractFile(archive, &header, "/dev/null")) {
+                fprintf(stderr, "Error extracting %s\n", header.name);
+                ret = 1;
+            }
+        }
+    }
+    fclose(archive);
+    return ret;   
 }

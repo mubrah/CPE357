@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
             return createArchive(argc, argv);
         } 
         if (operation == 't' + 'f') {
-            return 1;
+            return listArchive(argc, argv);
         }
         if (operation == 'x' + 'f') {
             return extractArchive(argc, argv);

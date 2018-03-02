@@ -78,7 +78,6 @@ int archiveData(char *finputName, FILE *archive) {
         }
     }
     fwrite(readBuf, TBLOCKSIZE, 1, archive);
-    
     fclose(finput);
     return 1;
 }
@@ -149,7 +148,6 @@ int createArchive(int argc, char **argv) {
             free(dirName);
         }
     }
-
     fwrite(emptyBlock, TBLOCKSIZE, 1, archive);
     fwrite(emptyBlock, TBLOCKSIZE, 1, archive);
     fclose(archive);
