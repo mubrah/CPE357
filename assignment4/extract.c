@@ -28,7 +28,7 @@ int extractFile(FILE *archive, struct tarHeader *header, char *foutputName) {
         if (feof(archive)) {
             break;
         } else if (ferror(archive)) {
-            printf("Could not read entire block\n");
+            fprintf(stderr, "Could not read entire block\n");
         } else {
             if (writtenSize + 512 > expectedSize) {
                 break;
@@ -45,12 +45,12 @@ int extractFile(FILE *archive, struct tarHeader *header, char *foutputName) {
     /* Set up file modes, owners, etc */ 
     int mode = convOctalStr(header->mode);
     if (chmod(header->name, mode) < 0) {
-        fprintf(stderr, "Could not chmod %s\n", header->name);
+        /* fprintf(stderr, "Could not chmod %s\n", header->name); */
     }
     if (chown(header->name,
         convOctalStr(header->uid),
         convOctalStr(header->gid)) < 0) {
-            fprintf(stderr, "Could not chown %s\n", header->name);
+            /* fprintf(stderr, "Could not chown %s\n", header->name); */
     }
     return 1; 
 }
@@ -61,7 +61,7 @@ int extractDir(FILE *archive, struct tarHeader *header) {
     if (chown(header->name,
         convOctalStr(header->uid),
         convOctalStr(header->gid)) < 0) {
-            fprintf(stderr, "Could not chown %s\n", header->name); 
+            /* fprintf(stderr, "Could not chown %s\n", header->name); */
     } 
     return 1;
 }
@@ -73,7 +73,7 @@ int extractSym(FILE *archive, struct tarHeader *header) {
     if (chown(header->name,
         convOctalStr(header->uid),
         convOctalStr(header->gid)) < 0) {
-            fprintf(stderr, "Could not chown %s\n", header->name); 
+            /* fprintf(stderr, "Could not chown %s\n", header->name); */
     } 
     return 1;
 }
