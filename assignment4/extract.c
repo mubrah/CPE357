@@ -74,14 +74,17 @@ int extractSym(FILE *archive, struct tarHeader *header) {
     return 1;
 }
 
-
-int extractArchive(int argc, char **argv) {
+/* bool verbose */
+int extractArchive(int argc, char **argv, int verbose) {
     FILE *archive;
     struct tarHeader header = {0};
     int ret = 0;
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
+        if (verbose) {
+            printf("%s\n", header.name);
+        }
         if (header.typeflag == REGTYPE) {
             if(!extractFile(archive, &header, header.name)) {
                 fprintf(stderr, "Error extracting %s\n", header.name);

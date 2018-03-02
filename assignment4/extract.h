@@ -37,6 +37,6 @@ int readHeader(FILE *archive, struct tarHeader *header);
 int extractFile(FILE *archive, struct tarHeader *header, char *foutputName);
 int extractDir(FILE *archive, struct tarHeader *header);
 int extractSym(FILE *archive, struct tarHeader *header);
-int extractArchive(int argc, char **argv);
+int extractArchive(int argc, char **argv, int verbose);
 int listArchive(int argc, char **argv);
 #endif

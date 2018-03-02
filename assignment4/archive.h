@@ -43,5 +43,5 @@
 
 int writeHeader(char *finputName, FILE *archive, struct stat *statBuf);
 int archiveData(char *finputName, FILE *archive);
-int createArchive(int argc, char **argv);
+int createArchive(int argc, char **argv, int verbose);
 #endif

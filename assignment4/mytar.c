@@ -2,9 +2,8 @@
 #include "archive.h"
 #include "extract.h"
 
-unsigned char getOption(char *options) {
-    int c=0, t=0, x=0, f=0, i=0;
-    unsigned char ret;
+int getOption(char *options) {
+    int c=0, t=0, x=0, f=0, v=0, i=0, ret = 0;
     for (i = 0; i < strlen(options); i++) {
         switch (options[i]) {
             case 'c':
@@ -19,6 +18,9 @@ unsigned char getOption(char *options) {
             case 'f':
                 f++;
                 break;
+            case 'v':
+                v++;
+                break;
             default:
                 fprintf(stderr, "unrecognized option '%c'.\n", options[i]);
                 return '\0';
@@ -32,15 +34,18 @@ unsigned char getOption(char *options) {
         return '\0';
     } else {
         if (c > 0) {
-            ret = 'c';
+            ret = (int)'c';
         } else if (t > 0) {
-            ret = 't';
+            ret = (int)'t';
         } else if (x > 0) { 
-            ret = 'x';
+            ret = (int)'x';
         }
     }
     if (f > 0) {
-        ret += 'f'; 
+        ret += (int)'f'; 
+    }
+    if (v > 0) {
+        ret += (int)'v';
     }
     return ret;
 }
@@ -48,7 +53,7 @@ unsigned char getOption(char *options) {
 /* usage: mytar <c | t | x>[v]f tarfile [path [...]] */
 int main(int argc, char **argv) {
     char usage[] = "usage: mytar <c | t | x>[v]f tarfile [path [...]]\n";
-    unsigned char operation;
+    int operation;
 
     if (argc < 2) {
         fprintf(stderr, usage);
@@ -57,7 +62,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, usage);
         return 1;
     } else {
-        if ((operation == 'c') || (operation == 't') || (operation == 'x')) {
+        if ((operation == (int)'c') || (operation == (int)'t') || (operation == (int)'x')) {
             fprintf(stderr, "specify a tar file with the 'f' option.\n");
             fprintf(stderr, usage);
             return 1;
@@ -67,15 +72,17 @@ int main(int argc, char **argv) {
             return 1;
         }
         
-        if (operation == 'c' + 'f') {
-            return createArchive(argc, argv);
-        } 
-        if (operation == 't' + 'f') {
+        if (operation == (int)('c' + 'f')) {
+            return createArchive(argc, argv, 0);
+        } else if (operation == (int)('c' + 'f' + 'v')) {
+            return createArchive(argc, argv, 1);
+        } else if (operation == (int)('t' + 'f')) {
             return listArchive(argc, argv);
-        }
-        if (operation == 'x' + 'f') {
-            return extractArchive(argc, argv);
+        } else if (operation == (int)('x' + 'f')) {
+            return extractArchive(argc, argv, 0);
+        } else if (operation == (int)('x' + 'f' + 'v')) {
+            return extractArchive(argc, argv, 1);
         }
     }
-    return 0;
+    return 1;
 }

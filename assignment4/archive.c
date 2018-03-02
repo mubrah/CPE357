@@ -106,7 +106,8 @@ char *fixDirName(char *origDirName) {
     return fixedDirName;
 }   /* Must free fixedDirName */
 
-int createArchive(int argc, char **argv) {
+/* bool verbose */
+int createArchive(int argc, char **argv, int verbose) {
     FILE *archive;
     char emptyBlock[TBLOCKSIZE] = {0};
     int i;
@@ -115,6 +116,8 @@ int createArchive(int argc, char **argv) {
     for (i = 3; i < argc; i++) {
         struct stat statBuf;
 
+        if (verbose)
+            printf("%s\n", argv[i]);
         lstat(argv[i], &statBuf);
         if (S_ISREG(statBuf.st_mode) > 0) {
             writeHeader(argv[i], archive, &statBuf);
@@ -139,6 +142,8 @@ int createArchive(int argc, char **argv) {
                 if ((dirEntry->d_ino != dirstatBuf.st_ino) &&
                     (dirEntry->d_ino != curstatBuf.st_ino)) {
                         fileName = appendStr(dirName, dirEntry->d_name);
+                        if (verbose)
+                            printf("%s\n", fileName);
                         lstat(fileName, &statBuf);
                         writeHeader(fileName, archive, &statBuf);
                         archiveData(fileName, archive);
