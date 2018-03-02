@@ -14,6 +14,10 @@
 #include <sys/types.h>
 #endif
 
+#ifndef _UNISTD_H
+#include <unistd.h>
+#endif
+
 #ifndef _SYS_STAT_H
 #include <sys/stat.h>
 #endif
@@ -37,7 +41,7 @@
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
 
-int writeHeader(char *finputName, FILE *archive);
+int writeHeader(char *finputName, FILE *archive, struct stat *statBuf);
 int archiveData(char *finputName, FILE *archive);
 int createArchive(int argc, char **argv);
 #endif

@@ -1,9 +1,8 @@
 #include "archive.h"
 
-int writeHeader(char *finputName, FILE *archive) {
+int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     struct tarHeader header = {0};
     unsigned char *_header = (unsigned char *)&header;
-    struct stat statBuf;
     struct passwd *user = NULL;
     struct group *group = NULL;
     int checksum, i;
@@ -11,43 +10,36 @@ int writeHeader(char *finputName, FILE *archive) {
 
     /* TODO: Get name from "path" as provided */
     strcpy(header.name, finputName);
-
-    if (stat(finputName, &statBuf) < 0) {
-        fprintf(stderr, "Could not stat %s\n", finputName);
-        return 0;
-    }
     
-    sprintf(header.mode, "%07o", statBuf.st_mode);
+    sprintf(header.mode, "%07o", statBuf->st_mode);
     header.mode[0] = '0';
     header.mode[1] = '0';
     header.mode[2] = '0';
 
-    sprintf(header.uid, "%07o", statBuf.st_uid);
+    sprintf(header.uid, "%07o", statBuf->st_uid);
 
-    sprintf(header.gid, "%07o", statBuf.st_gid);
+    sprintf(header.gid, "%07o", statBuf->st_gid);
 
-    sprintf(header.size, "%011lo", statBuf.st_size);
+    sprintf(header.mtime, "%011lo", statBuf->st_mtime);
 
-    sprintf(header.mtime, "%011lo", statBuf.st_mtime);
-
-    if (S_ISREG(statBuf.st_mode) > 0) {
+    if (S_ISREG(statBuf->st_mode) > 0) {
         header.typeflag = REGTYPE;
-    } else if (S_ISLNK(statBuf.st_mode) > 0) {
+        sprintf(header.size, "%011lo", statBuf->st_size);    
+    } else if (S_ISLNK(statBuf->st_mode) > 0) {
         header.typeflag = SYMTYPE;
-    } else if (S_ISDIR(statBuf.st_mode) > 0) {
+        readlink(finputName, header.linkname, TNAMESIZE);
+    } else if (S_ISDIR(statBuf->st_mode) > 0) {
         header.typeflag = DIRTYPE;
     }
-
-    /* TODO: Do link name */
-
+    
     strcpy(header.magic, TMAGIC);
 
     strcpy(header.version, TVERSION);
 
-    user = getpwuid(statBuf.st_uid);
+    user = getpwuid(statBuf->st_uid);
     strcpy(header.uname, user->pw_name);
     
-    group = getgrgid(statBuf.st_gid);
+    group = getgrgid(statBuf->st_gid);
     strcpy(header.gname, group->gr_name);
 
     /* Header devmajor and devminor not implemented */
@@ -124,11 +116,13 @@ int createArchive(int argc, char **argv) {
     for (i = 3; i < argc; i++) {
         struct stat statBuf;
 
-        stat(argv[i], &statBuf);
+        lstat(argv[i], &statBuf);
         if (S_ISREG(statBuf.st_mode) > 0) {
-            writeHeader(argv[i], archive);
+            writeHeader(argv[i], archive, &statBuf);
             archiveData(argv[i], archive);
-        } else if (S_ISDIR(statBuf.st_mode) > 0) {
+        } else if (S_ISLNK(statBuf.st_mode) > 0) {
+            writeHeader(argv[i], archive, &statBuf);
+        } else if (S_ISDIR(statBuf.st_mode) > 0) {  
             DIR *dir = NULL;
             struct dirent *dirEntry = NULL;
             struct stat dirstatBuf;
@@ -137,7 +131,7 @@ int createArchive(int argc, char **argv) {
             char *fileName = NULL;
 
             dirName = fixDirName(argv[i]);
-            writeHeader(dirName, archive);
+            writeHeader(dirName, archive, &statBuf);
             
             dir = opendir(dirName);
             stat(".", &curstatBuf);
@@ -146,7 +140,7 @@ int createArchive(int argc, char **argv) {
                 if ((dirEntry->d_ino != dirstatBuf.st_ino) &&
                     (dirEntry->d_ino != curstatBuf.st_ino)) {
                         fileName = appendStr(dirName, dirEntry->d_name);
-                        writeHeader(fileName, archive);
+                        writeHeader(fileName, archive, &statBuf);
                         archiveData(fileName, archive);
                         free(fileName);
                     }

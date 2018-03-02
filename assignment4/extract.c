@@ -1,11 +1,5 @@
 #include "extract.h"
 
-
-int readHeader(FILE *archive, struct tarHeader *header) {
-    fread(header, TBLOCKSIZE, 1, archive);
-    return convOctalStr(header->chksum);
-}
-
 int convOctalStr(char *octalString) {
     int res = 0;
     int len = strlen(octalString);
@@ -16,6 +10,11 @@ int convOctalStr(char *octalString) {
     }
 
     return res;
+}
+
+int readHeader(FILE *archive, struct tarHeader *header) {
+    fread(header, TBLOCKSIZE, 1, archive);
+    return convOctalStr(header->chksum);
 }
 
 int extractFile(FILE *archive, struct tarHeader *header) {
@@ -61,9 +60,17 @@ int extractFile(FILE *archive, struct tarHeader *header) {
 int extractDir(FILE *archive, struct tarHeader *header) {
     mkdir(header->name, convOctalStr(header->mode));
     
-    int uid = convOctalStr(header->uid);
-    int gid = convOctalStr(header->gid);
-    if (chown(header->name, uid, gid) < 0) {
+    if (chown(header->name, convOctalStr(header->uid), convOctalStr(header->gid)) < 0) {
+        fprintf(stderr, "Could not chown %s\n", header->name); 
+    } 
+    return 1;
+}
+
+int extractSym(FILE *archive, struct tarHeader *header) {
+    symlink(header->linkname, header->name);
+    
+    chmod(header->name, convOctalStr(header->mode));
+    if (chown(header->name, convOctalStr(header->uid), convOctalStr(header->gid)) < 0) {
         fprintf(stderr, "Could not chown %s\n", header->name); 
     } 
     return 1;
@@ -82,6 +89,11 @@ int extractArchive(int argc, char **argv) {
             if(!extractFile(archive, &header)) {
                 fprintf(stderr, "Error extracting %s\n", header.name);
                 ret = 1;
+            }
+        } else if (header.typeflag == SYMTYPE) {
+            if (!extractSym(archive, &header)) {
+                fprintf(stderr, "Error extracting %s\n", header.name);
+                ret = 1;                
             }
         } else if (header.typeflag == DIRTYPE) {
             if(!extractDir(archive, &header)) {

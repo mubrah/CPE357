@@ -22,13 +22,14 @@
 #define MYTAR_H
 
 #define TBLOCKSIZE 512
+#define TNAMESIZE 100
 
 /* tar Header Block, from POSIX 1003.1-1990.  */
 
 /* POSIX header.  */
 
 struct tarHeader {              /* byte offset */
-  char name[100];               /*   0 */
+  char name[TNAMESIZE];         /*   0 */
   char mode[8];                 /* 100 */
   char uid[8];                  /* 108 */
   char gid[8];                  /* 116 */
@@ -36,7 +37,7 @@ struct tarHeader {              /* byte offset */
   char mtime[12];               /* 136 */
   char chksum[8];               /* 148 */
   char typeflag;                /* 156 */
-  char linkname[100];           /* 157 */
+  char linkname[TNAMESIZE];     /* 157 */
   char magic[6];                /* 257 */
   char version[2];              /* 263 */
   char uname[32];               /* 265 */

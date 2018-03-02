@@ -47,7 +47,6 @@ unsigned char getOption(char *options) {
 
 /* usage: mytar <c | t | x>[v]f tarfile [path [...]] */
 int main(int argc, char **argv) {
-    FILE *archive;
     char usage[] = "usage: mytar <c | t | x>[v]f tarfile [path [...]]\n";
     unsigned char operation;
 
