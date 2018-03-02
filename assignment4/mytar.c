@@ -50,7 +50,6 @@ int main(int argc, char **argv) {
     FILE *archive;
     char usage[] = "usage: mytar <c | t | x>[v]f tarfile [path [...]]\n";
     unsigned char operation;
-    int i = 0;
 
     if (argc < 2) {
         fprintf(stderr, usage);
@@ -76,14 +75,7 @@ int main(int argc, char **argv) {
             return 1;
         }
         if (operation == 'x' + 'f') {
-            archive = fopen(argv[2], "rb");
-            for (i = 3; i < argc; i++) {
-                struct tarHeader header = {0};
-
-                readHeader(argv[i], archive, &header);
-                extractData(argv[i], archive, &header);
-            }
-            fclose(archive);
+            return extractArchive(argc, argv);
         }
     }
     return 0;

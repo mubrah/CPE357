@@ -33,7 +33,8 @@
 #ifndef EXTRACT_H
 #define EXTRACT_H
 
-int readHeader(char *finputName, FILE *archive, struct tarHeader *header);
-int extractFile(char *finputName, FILE *archive, struct tarHeader *header);
-int extractData(char *finputName, FILE *archive, struct tarHeader *header);
+int readHeader(FILE *archive, struct tarHeader *header);
+int extractFile(FILE *archive, struct tarHeader *header);
+int extractDir(FILE *archive, struct tarHeader *header);
+int extractArchive(int argc, char **argv);
 #endif

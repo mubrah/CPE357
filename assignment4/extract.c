@@ -1,22 +1,12 @@
 #include "extract.h"
 
-int readHeader(char *finputName, FILE *archive, struct tarHeader *header) {
+
+int readHeader(FILE *archive, struct tarHeader *header) {
     fread(header, TBLOCKSIZE, 1, archive);
-    return 1;
+    return convOctalStr(header->chksum);
 }
 
-int checksum(char *tarBlock) {
-    int checksum = 0;
-    int i;
-
-    for (i = 0; i < TBLOCKSIZE; i++) {
-        checksum += (int)tarBlock[i];
-    }
-
-    return checksum;
-}
-
-int octalStr2Int(char *octalString) {
+int convOctalStr(char *octalString) {
     int res = 0;
     int len = strlen(octalString);
     int i;
@@ -28,13 +18,13 @@ int octalStr2Int(char *octalString) {
     return res;
 }
 
-int extractFile(char *foutputName, FILE *archive, struct tarHeader *header) {
+int extractFile(FILE *archive, struct tarHeader *header) {
     FILE *foutput;
     char readBuf[TBLOCKSIZE] = {0};
-    int expectedSize = octalStr2Int(header->size);
+    int expectedSize = convOctalStr(header->size);
     int writtenSize = 0;
 
-    foutput = fopen(foutputName, "wb");
+    foutput = fopen(header->name, "wb");
     
     while (fread(readBuf, TBLOCKSIZE, 1, archive)) {
         if (feof(archive)) {
@@ -52,29 +42,57 @@ int extractFile(char *foutputName, FILE *archive, struct tarHeader *header) {
         }
     }
     fwrite(readBuf, expectedSize - writtenSize, 1, foutput);
-    memset(readBuf, 0, TBLOCKSIZE);
-    /* Advance the tar 2 data blocks and close */
-    fread(readBuf, TBLOCKSIZE, 1, archive);
-    fread(readBuf, TBLOCKSIZE, 1, archive);
     fclose(foutput);
 
     /* Set up file modes, owners, etc */ 
-    int mode = octalStr2Int(header->mode);
-    if (chmod(foutputName, mode) < 0) {
-        /* ferror("Could not chmod file\n"); */
+    int mode = convOctalStr(header->mode);
+    if (chmod(header->name, mode) < 0) {
+        fprintf(stderr, "Could not chmod %s\n", header->name);
     }
-    int uid = octalStr2Int(header->uid);
-    int gid = octalStr2Int(header->gid);
-    if (chown(foutputName, uid, gid) < 0) {
-        /* ferror("Could not chown file\n"); */ 
+    if (chown(header->name,
+        convOctalStr(header->uid),
+        convOctalStr(header->gid)) < 0) {
+            fprintf(stderr, "Could not chown %s\n", header->name);
     } 
 
     return 1; 
 }
 
-int extractData(char *foutputName, FILE *archive, struct tarHeader *header) {
-    if (header->typeflag == '0') {
-        return extractFile(foutputName, archive, header);
+int extractDir(FILE *archive, struct tarHeader *header) {
+    mkdir(header->name, convOctalStr(header->mode));
+    
+    int uid = convOctalStr(header->uid);
+    int gid = convOctalStr(header->gid);
+    if (chown(header->name, uid, gid) < 0) {
+        fprintf(stderr, "Could not chown %s\n", header->name); 
+    } 
+    return 1;
+}
+
+
+int extractArchive(int argc, char **argv) {
+    FILE *archive;
+    struct tarHeader header = {0};
+    int ret = 0;
+
+    archive = fopen(argv[2], "rb");
+
+    while (readHeader(archive, &header) != 0) {
+        if (header.typeflag == REGTYPE) {
+            if(!extractFile(archive, &header)) {
+                fprintf(stderr, "Error extracting %s\n", header.name);
+                ret = 1;
+            }
+        } else if (header.typeflag == DIRTYPE) {
+            if(!extractDir(archive, &header)) {
+                fprintf(stderr, "Error extracting %s\n", header.name);
+                ret = 1;
+            }
+            
+        }
     }
-    return 0;
+        
+
+    fclose(archive);
+    return ret;
 }

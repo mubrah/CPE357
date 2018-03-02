@@ -115,10 +115,6 @@ char *fixDirName(char *origDirName) {
     return fixedDirName;
 }   /* Must free fixedDirName */
 
-char *prependDir() {
-    
-}
-
 int createArchive(int argc, char **argv) {
     FILE *archive;
     char emptyBlock[TBLOCKSIZE] = {0};
@@ -128,9 +124,9 @@ int createArchive(int argc, char **argv) {
     for (i = 3; i < argc; i++) {
         struct stat statBuf;
 
-        writeHeader(argv[i], archive);
         stat(argv[i], &statBuf);
         if (S_ISREG(statBuf.st_mode) > 0) {
+            writeHeader(argv[i], archive);
             archiveData(argv[i], archive);
         } else if (S_ISDIR(statBuf.st_mode) > 0) {
             DIR *dir = NULL;
@@ -141,6 +137,7 @@ int createArchive(int argc, char **argv) {
             char *fileName = NULL;
 
             dirName = fixDirName(argv[i]);
+            writeHeader(dirName, archive);
             
             dir = opendir(dirName);
             stat(".", &curstatBuf);
