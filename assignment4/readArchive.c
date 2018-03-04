@@ -130,14 +130,15 @@ int listArchive(int argc, char **argv, int verbose) {
              * mtime            16 chars
              * name             
              */
-            char mode[10] = {'-'};
+            char mode[11] = {'\0'};
             int  perms = convOctalStr(header.mode);
             char owner[17] = {'\0'};
             char *_owner = owner;
             int unameLen = strlen(header.uname);
             int gnameLen = strlen(header.gname);
             time_t mtime = convOctalStr(header.mtime);
-            char mtimeBuf[16] = {'\0'};
+            struct tm *time = NULL;
+            char mtimeBuf[17] = {'\0'};
             
             switch (header.typeflag) {
                 case REGTYPE: 
@@ -152,22 +153,31 @@ int listArchive(int argc, char **argv, int verbose) {
             }
             if (perms & S_IRUSR)
                 mode[1] = 'r';
+            else mode[1] = '-';
             if (perms & S_IWUSR)
                 mode[2] = 'w';
+            else mode[2] = '-';
             if (perms & S_IXUSR)
                 mode[3] = 'x';
+            else mode[3] = '-';
             if (perms & S_IRGRP)
                 mode[4] = 'r';
+            else mode[4] = '-';
             if (perms & S_IWGRP)
                 mode[5] = 'w';
+            else mode[5] = '-';
             if (perms & S_IXGRP)
                 mode[6] = 'x';
+            else mode[6] = '-';
             if (perms & S_IROTH)
                 mode[7] = 'r';
+            else mode[7] = '-';
             if (perms & S_IWOTH)
                 mode[8] = 'w';
+            else mode[8] = '-';
             if (perms & S_IXOTH)
                 mode[9] = 'x';
+            else mode[9] = '-';
 
             if (unameLen < 17) {
                 strncpy(owner, header.uname, unameLen);
@@ -183,9 +193,15 @@ int listArchive(int argc, char **argv, int verbose) {
                 strncpy(owner, header.uname, 17);
             }
 
-            ctime_r(mtime, mtimeBuf);            
-            
-            printf("%s %s % 8i %s %s\n",
+            time = localtime(&mtime);
+            sprintf(mtimeBuf, "%04i-%02i-%02i %02i:%02i",
+                1900 + time->tm_year,
+                time->tm_mon,
+                time->tm_mday,
+                time->tm_hour,
+                time->tm_min);
+
+            printf("%10s %-17s %8i %16s %s\n",
                 mode,
                 owner,
                 convOctalStr(header.size),
