@@ -117,7 +117,8 @@ char *fixDirName(char *origDirName) {
     return fixedDirName;
 }   /* Must free fixedDirName */
 
-int archiveDir(char *dirName, FILE *archive, struct stat *statBuf, int verbose) {
+int archiveDir(char *dirName, FILE *archive, struct stat *statBuf,
+            int verbose) {
     DIR *dir = NULL;
     struct dirent *dirEntry = NULL;
     struct stat dirstatBuf;
