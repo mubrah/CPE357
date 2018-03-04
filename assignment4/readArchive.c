@@ -81,17 +81,18 @@ int extractSym(FILE *archive, struct tarHeader *header) {
 
 void createName(char *nameBuffer, char *prefix, char *name) {
     char *_name = nameBuffer;
+    int prefixLen = 0;
 
-    memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
-    if (strlen(prefix) > TPREFIXSIZE) {
+    memset(nameBuffer, '\0', TNAMESIZE + TPREFIXSIZE);
+    if ((prefixLen = strlen(prefix)) >= TPREFIXSIZE) {
         strncpy(_name, prefix, TPREFIXSIZE);
     } else {
         strcpy(_name, prefix);
     }
-    if (strlen(name) > TNAMESIZE) {
-        strncpy(_name + strlen(prefix), name, TNAMESIZE);
+    if (strlen(name) >= TNAMESIZE) {
+        strncpy(_name + prefixLen, name, TNAMESIZE);
     } else {
-        strcpy(_name + strlen(prefix), name);
+        strcpy(_name + prefixLen, name);
     }
 }
 
