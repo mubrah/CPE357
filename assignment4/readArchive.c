@@ -89,6 +89,7 @@ int extractArchive(int argc, char **argv, int verbose) {
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
+        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
         strcpy(_name, header.prefix);
         strcpy(_name + strlen(header.prefix), header.name);
         if (verbose) {
@@ -114,7 +115,6 @@ int extractArchive(int argc, char **argv, int verbose) {
                 }
                 break;
         }
-        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
     }
     fclose(archive);
     return ret;
@@ -129,6 +129,7 @@ int listArchive(int argc, char **argv, int verbose) {
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
+        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
         strcpy(_name, header.prefix);
         strcpy(_name + strlen(header.prefix), header.name);
         if (verbose) {
@@ -225,7 +226,6 @@ int listArchive(int argc, char **argv, int verbose) {
                 ret = 1;
             }
         }
-        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
     }
     fclose(archive);
     return ret;   
