@@ -135,104 +135,123 @@ int extractArchive(int argc, char **argv, int verbose) {
     return ret;
 }
 
+int topStrContains(char *base, char *key) {
+    int keyLen = strlen(key);
+    char _base[keyLen + 1];
+    char _key[keyLen + 1];
+    int ret;
+
+    memset(_base, '\0', keyLen + 1);
+    memset(_key, '\0', keyLen + 1);
+    strcpy(_key, key);
+    strncpy(_base, base, keyLen);
+    ret = strcmp(_base, _key);
+    return ret;
+}
+
 int listArchive(int argc, char **argv, int verbose) {
     FILE *archive;
     struct tarHeader header = {0};
-    int ret = 0;
+    int ret = 0, i;
     char name[TNAMESIZE + TPREFIXSIZE] = {'\0'};
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
         createName(&name, header.prefix, header.name);
-        
-        if (verbose) {
-            /* Verbose Contents listing follows the following format
-             * mode             10 chars
-             * uname/gname      17 chars
-             * size             8  chars
-             * mtime            16 chars
-             * name             
-             */
-            char mode[11] = {'\0'};
-            int  perms = convOctalStr(header.mode);
-            char owner[17] = {'\0'};
-            char *_owner = owner;
-            int unameLen = strlen(header.uname);
-            int gnameLen = strlen(header.gname);
-            time_t mtime = convOctalStr(header.mtime);
-            struct tm *time = NULL;
-            char mtimeBuf[17] = {'\0'};
-            
-            switch (header.typeflag) {
-                case REGTYPE: 
-                    mode[0] = '-';
-                    break;
-                case SYMTYPE:
-                    mode[0] = 'l';
-                    break;
-                case DIRTYPE:
-                    mode[0] = 'd';
-                    break;
-            }
-            if (perms & S_IRUSR)
-                mode[1] = 'r';
-            else mode[1] = '-';
-            if (perms & S_IWUSR)
-                mode[2] = 'w';
-            else mode[2] = '-';
-            if (perms & S_IXUSR)
-                mode[3] = 'x';
-            else mode[3] = '-';
-            if (perms & S_IRGRP)
-                mode[4] = 'r';
-            else mode[4] = '-';
-            if (perms & S_IWGRP)
-                mode[5] = 'w';
-            else mode[5] = '-';
-            if (perms & S_IXGRP)
-                mode[6] = 'x';
-            else mode[6] = '-';
-            if (perms & S_IROTH)
-                mode[7] = 'r';
-            else mode[7] = '-';
-            if (perms & S_IWOTH)
-                mode[8] = 'w';
-            else mode[8] = '-';
-            if (perms & S_IXOTH)
-                mode[9] = 'x';
-            else mode[9] = '-';
+        for (i = 3; i < argc; i++) {
+            if (topStrContains(&name, argv[i]) == 0) {
+                if (verbose) {
+                    /* Verbose Contents listing follows the following format
+                    * mode             10 chars
+                    * uname/gname      17 chars
+                    * size             8  chars
+                    * mtime            16 chars
+                    * name             
+                    */
+                    char mode[11] = {'\0'};
+                    int  perms = convOctalStr(header.mode);
+                    char owner[17] = {'\0'};
+                    char *_owner = owner;
+                    int unameLen = strlen(header.uname);
+                    int gnameLen = strlen(header.gname);
+                    time_t mtime = convOctalStr(header.mtime);
+                    struct tm *time = NULL;
+                    char mtimeBuf[17] = {'\0'};
+                    
+                    switch (header.typeflag) {
+                        case REGTYPE: 
+                            mode[0] = '-';
+                            break;
+                        case SYMTYPE:
+                            mode[0] = 'l';
+                            break;
+                        case DIRTYPE:
+                            mode[0] = 'd';
+                            break;
+                    }
+                    if (perms & S_IRUSR)
+                        mode[1] = 'r';
+                    else mode[1] = '-';
+                    if (perms & S_IWUSR)
+                        mode[2] = 'w';
+                    else mode[2] = '-';
+                    if (perms & S_IXUSR)
+                        mode[3] = 'x';
+                    else mode[3] = '-';
+                    if (perms & S_IRGRP)
+                        mode[4] = 'r';
+                    else mode[4] = '-';
+                    if (perms & S_IWGRP)
+                        mode[5] = 'w';
+                    else mode[5] = '-';
+                    if (perms & S_IXGRP)
+                        mode[6] = 'x';
+                    else mode[6] = '-';
+                    if (perms & S_IROTH)
+                        mode[7] = 'r';
+                    else mode[7] = '-';
+                    if (perms & S_IWOTH)
+                        mode[8] = 'w';
+                    else mode[8] = '-';
+                    if (perms & S_IXOTH)
+                        mode[9] = 'x';
+                    else mode[9] = '-';
 
-            if (unameLen < 17) {
-                strncpy(owner, header.uname, unameLen);
-                _owner += unameLen;
-                *_owner = '/';
-                _owner++;
-                if (unameLen + gnameLen < 17) {
-                    strncpy(_owner, header.gname, gnameLen);
+                    if (unameLen < 17) {
+                        strncpy(owner, header.uname, unameLen);
+                        _owner += unameLen;
+                        *_owner = '/';
+                        _owner++;
+                        if (unameLen + gnameLen < 17) {
+                            strncpy(_owner, header.gname, gnameLen);
+                        } else {
+                            strncpy(_owner, header.gname, 17 - unameLen);
+                        }
+                    } else {
+                        strncpy(owner, header.uname, 17);
+                    }
+
+                    time = localtime(&mtime);
+                    sprintf(mtimeBuf, "%04i-%02i-%02i %02i:%02i",
+                        1900 + time->tm_year,
+                        time->tm_mon + 1,
+                        time->tm_mday,
+                        time->tm_hour,
+                        time->tm_min);
+
+                    printf("%10s %-17s %8i %16s %s\n",
+                        mode,
+                        owner,
+                        convOctalStr(header.size),
+                        mtimeBuf,
+                        name);
                 } else {
-                    strncpy(_owner, header.gname, 17 - unameLen);
+                    printf("%s\n", name);
                 }
-            } else {
-                strncpy(owner, header.uname, 17);
             }
-
-            time = localtime(&mtime);
-            sprintf(mtimeBuf, "%04i-%02i-%02i %02i:%02i",
-                1900 + time->tm_year,
-                time->tm_mon + 1,
-                time->tm_mday,
-                time->tm_hour,
-                time->tm_min);
-
-            printf("%10s %-17s %8i %16s %s\n",
-                mode,
-                owner,
-                convOctalStr(header.size),
-                mtimeBuf,
-                name);
-        } else {
-            printf("%s\n", name);
         }
+            
+
         if (header.typeflag == REGTYPE) {
             if(!extractFile(archive, &header, "/dev/null")) {
                 fprintf(stderr, "Error extracting %s\n", name);

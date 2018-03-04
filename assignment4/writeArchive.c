@@ -153,6 +153,7 @@ int archiveDir(char *dirName, FILE *archive, struct stat *statBuf,
     }
     closedir(dir);
     free(dirName);
+    return 1;
 }
 
 /* bool verbose */
