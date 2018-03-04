@@ -165,10 +165,12 @@ int createArchive(int argc, char **argv, int verbose) {
     for (i = 3; i < argc; i++) {
         struct stat statBuf;
 
+        if (lstat(argv[i], &statBuf) < 0) {
+            continue;
+        }
         if (verbose) {
             printf("%s\n", argv[i]);
         }
-        lstat(argv[i], &statBuf);
         if (S_ISREG(statBuf.st_mode) > 0) {
             writeHeader(argv[i], archive, &statBuf);
             archiveFile(argv[i], archive);
