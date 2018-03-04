@@ -34,6 +34,7 @@ int extractFile(FILE *archive, struct tarHeader *header, char *foutputName) {
                 break;
             } else {
                 fwrite(readBuf, TBLOCKSIZE, 1,  foutput);
+                writtenSize += 512;
                 memset(readBuf, 0, TBLOCKSIZE);
                 continue;
             }
@@ -80,7 +81,7 @@ int extractSym(FILE *archive, struct tarHeader *header) {
 
 /* bool verbose */
 int extractArchive(int argc, char **argv, int verbose) {
-    FILE *archive;
+    FILE *archive = NULL;
     struct tarHeader header = {0};
     int ret = 0;
 
@@ -89,21 +90,25 @@ int extractArchive(int argc, char **argv, int verbose) {
         if (verbose) {
             printf("%s\n", header.name);
         }
-        if (header.typeflag == REGTYPE) {
-            if(!extractFile(archive, &header, header.name)) {
-                fprintf(stderr, "Error extracting %s\n", header.name);
-                ret = 1;
-            }
-        } else if (header.typeflag == SYMTYPE) {
-            if (!extractSym(archive, &header)) {
-                fprintf(stderr, "Error extracting %s\n", header.name);
-                ret = 1;                
-            }
-        } else if (header.typeflag == DIRTYPE) {
-            if(!extractDir(archive, &header)) {
-                fprintf(stderr, "Error extracting %s\n", header.name);
-                ret = 1;
-            }
+        switch (header.typeflag) {
+            case REGTYPE:
+                if(!extractFile(archive, &header, header.name)) {
+                    fprintf(stderr, "Error extracting %s\n", header.name);
+                    ret = 1;
+                }
+                break;
+            case SYMTYPE:
+                if (!extractSym(archive, &header)) {
+                    fprintf(stderr, "Error extracting %s\n", header.name);
+                    ret = 1;                
+                }
+                break;
+            case DIRTYPE:
+                if(!extractDir(archive, &header)) {
+                    fprintf(stderr, "Error extracting %s\n", header.name);
+                    ret = 1;
+                }
+                break;
         }
     }
     fclose(archive);
@@ -118,7 +123,74 @@ int listArchive(int argc, char **argv, int verbose) {
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
         if (verbose) {
+            /* Verbose Contents listing follows the following format
+             * mode             10 chars
+             * uname/gname      17 chars
+             * size             8  chars
+             * mtime            16 chars
+             * name             
+             */
+            char mode[10] = {'-'};
+            int  perms = convOctalStr(header.mode);
+            char owner[17] = {'\0'};
+            char *_owner = owner;
+            int unameLen = strlen(header.uname);
+            int gnameLen = strlen(header.gname);
+            time_t mtime = convOctalStr(header.mtime);
+            char mtimeBuf[16] = {'\0'};
             
+            switch (header.typeflag) {
+                case REGTYPE: 
+                    mode[0] = '-';
+                    break;
+                case SYMTYPE:
+                    mode[0] = 'l';
+                    break;
+                case DIRTYPE:
+                    mode[0] = 'd';
+                    break;
+            }
+            if (perms & S_IRUSR)
+                mode[1] = 'r';
+            if (perms & S_IWUSR)
+                mode[2] = 'w';
+            if (perms & S_IXUSR)
+                mode[3] = 'x';
+            if (perms & S_IRGRP)
+                mode[4] = 'r';
+            if (perms & S_IWGRP)
+                mode[5] = 'w';
+            if (perms & S_IXGRP)
+                mode[6] = 'x';
+            if (perms & S_IROTH)
+                mode[7] = 'r';
+            if (perms & S_IWOTH)
+                mode[8] = 'w';
+            if (perms & S_IXOTH)
+                mode[9] = 'x';
+
+            if (unameLen < 17) {
+                strncpy(owner, header.uname, unameLen);
+                _owner += unameLen;
+                *_owner = '/';
+                _owner++;
+                if (unameLen + gnameLen < 17) {
+                    strncpy(_owner, header.gname, gnameLen);
+                } else {
+                    strncpy(_owner, header.gname, 17 - unameLen);
+                }
+            } else {
+                strncpy(owner, header.uname, 17);
+            }
+
+            ctime_r(mtime, mtimeBuf);            
+            
+            printf("%s %s % 8i %s %s\n",
+                mode,
+                owner,
+                convOctalStr(header.size),
+                mtimeBuf,
+                header.name);
         } else {
             printf("%s\n", header.name);
         }

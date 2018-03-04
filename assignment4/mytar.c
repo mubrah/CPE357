@@ -74,18 +74,19 @@ int main(int argc, char **argv) {
             return 1;
         }
         
-        if (operation == (int)('c' + 'f')) {
-            return createArchive(argc, argv, 0);
-        } else if (operation == (int)('c' + 'f' + 'v')) {
-            return createArchive(argc, argv, 1);
-        } else if (operation == (int)('t' + 'f')) {
-            return listArchive(argc, argv, 0);
-        } else if (operation == (int)('t' + 'f' + 'v')) {
-            return listArchive(argc, argv, 1);
-        } else if (operation == (int)('x' + 'f')) {
-            return extractArchive(argc, argv, 0);
-        } else if (operation == (int)('x' + 'f' + 'v')) {
-            return extractArchive(argc, argv, 1);
+        switch (operation) {
+            case (int)('c' + 'f'):
+                return createArchive(argc, argv, 0);
+            case (int)('c' + 'f' + 'v'):
+                return createArchive(argc, argv, 1);
+            case (int)('t' + 'f'):
+                return listArchive(argc, argv, 0);
+            case (int)('t' + 'f' + 'v'):
+                return listArchive(argc, argv, 1);
+            case (int)('x' + 'f'):
+                return extractArchive(argc, argv, 0);
+            case (int)('x' + 'f' + 'v'):
+                return extractArchive(argc, argv, 1);
         }
     }
     return 1;

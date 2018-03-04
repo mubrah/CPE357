@@ -26,6 +26,10 @@
 #include <grp.h>
 #endif
 
+#ifndef _TIME_H
+#include <time.h>
+#endif
+
 #ifndef MYTAR_H
 #include "mytar.h"
 #endif
