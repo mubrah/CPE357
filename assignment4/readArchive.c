@@ -79,19 +79,32 @@ int extractSym(FILE *archive, struct tarHeader *header) {
     return 1;
 }
 
+void createName(char *nameBuffer, char *prefix, char *name) {
+    char *_name = nameBuffer;
+    memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
+    if (strlen(prefix) > TPREFIXSIZE) {
+        strncpy(_name, prefix, TPREFIXSIZE);
+    } else {
+        strcpy(_name, prefix);
+    }
+    if (strlen(name) > TNAMESIZE) {
+        strncpy(_name + strlen(prefix), name, TNAMESIZE);
+    } else {
+        strcpy(_name + strlen(prefix), name);
+    }
+}
+
 /* bool verbose */
 int extractArchive(int argc, char **argv, int verbose) {
     FILE *archive = NULL;
     struct tarHeader header = {0};
     int ret = 0;
     char name[TNAMESIZE + TPREFIXSIZE] = {'\0'};
-    char *_name = name;
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
-        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
-        strcpy(_name, header.prefix);
-        strcpy(_name + strlen(header.prefix), header.name);
+        createName(name, header.prefix, header.name);
+
         if (verbose) {
             printf("%s\n", name);
         }
@@ -129,9 +142,8 @@ int listArchive(int argc, char **argv, int verbose) {
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
-        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
-        strcpy(_name, header.prefix);
-        strcpy(_name + strlen(header.prefix), header.name);
+        createName(name, header.prefix, header.name);
+        
         if (verbose) {
             /* Verbose Contents listing follows the following format
              * mode             10 chars
