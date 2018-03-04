@@ -80,6 +80,8 @@ int main(int argc, char **argv) {
             return createArchive(argc, argv, 1);
         } else if (operation == (int)('t' + 'f')) {
             return listArchive(argc, argv);
+        } else if (operation == (int)('t' + 'f' + 'v')) {
+            return listArchive(argc, argv, 1);
         } else if (operation == (int)('x' + 'f')) {
             return extractArchive(argc, argv, 0);
         } else if (operation == (int)('x' + 'f' + 'v')) {

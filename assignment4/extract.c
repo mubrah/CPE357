@@ -110,14 +110,18 @@ int extractArchive(int argc, char **argv, int verbose) {
     return ret;
 }
 
-int listArchive(int argc, char **argv) {
+int listArchive(int argc, char **argv, int verbose) {
     FILE *archive;
     struct tarHeader header = {0};
     int ret = 0;
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
-        printf("%s\n", header.name);
+        if (verbose) {
+
+        } else {
+            printf("%s\n", header.name);
+        }
         if (header.typeflag == REGTYPE) {
             if(!extractFile(archive, &header, "/dev/null")) {
                 fprintf(stderr, "Error extracting %s\n", header.name);
