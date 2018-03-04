@@ -11,13 +11,13 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     /* Header devmajor and devminor not implemented */
     
     if (nameLen > TNAMESIZE) {
-        char nameOverflow[TPREFIXSIZE] = {0};
+        char nameOverflow[TNAMESIZE] = {0};
         
-        strncpy(header.name, finputName, TNAMESIZE);
-        for (i = TNAMESIZE; finputName[i]; i++) {
-            nameOverflow[i - TNAMESIZE] = finputName[i];
+        strncpy(header.prefix, finputName, TPREFIXSIZE);
+        for (i = TPREFIXSIZE; finputName[i]; i++) {
+            nameOverflow[i - TPREFIXSIZE] = finputName[i];
         }
-        strncpy(header.prefix, nameOverflow, TPREFIXSIZE);
+        strncpy(header.name, nameOverflow, TNAMESIZE);
     } else {
         strcpy(header.name, finputName);
     }

@@ -84,32 +84,37 @@ int extractArchive(int argc, char **argv, int verbose) {
     FILE *archive = NULL;
     struct tarHeader header = {0};
     int ret = 0;
+    char name[TNAMESIZE + TPREFIXSIZE] = {'\0'};
+    char *_name = name;
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
+        strcpy(_name, header.prefix);
+        strcpy(_name + strlen(header.prefix), header.name);
         if (verbose) {
-            printf("%s\n", header.name);
+            printf("%s\n", name);
         }
         switch (header.typeflag) {
             case REGTYPE:
-                if(!extractFile(archive, &header, header.name)) {
-                    fprintf(stderr, "Error extracting %s\n", header.name);
+                if(!extractFile(archive, &header, name)) {
+                    fprintf(stderr, "Error extracting %s\n", name);
                     ret = 1;
                 }
                 break;
             case SYMTYPE:
                 if (!extractSym(archive, &header)) {
-                    fprintf(stderr, "Error extracting %s\n", header.name);
+                    fprintf(stderr, "Error extracting %s\n", name);
                     ret = 1;                
                 }
                 break;
             case DIRTYPE:
                 if(!extractDir(archive, &header)) {
-                    fprintf(stderr, "Error extracting %s\n", header.name);
+                    fprintf(stderr, "Error extracting %s\n", name);
                     ret = 1;
                 }
                 break;
         }
+        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
     }
     fclose(archive);
     return ret;
@@ -119,9 +124,13 @@ int listArchive(int argc, char **argv, int verbose) {
     FILE *archive;
     struct tarHeader header = {0};
     int ret = 0;
+    char name[TNAMESIZE + TPREFIXSIZE] = {'\0'};
+    char *_name = name;
 
     archive = fopen(argv[2], "rb");
     while (readHeader(archive, &header) != 0) {
+        strcpy(_name, header.prefix);
+        strcpy(_name + strlen(header.prefix), header.name);
         if (verbose) {
             /* Verbose Contents listing follows the following format
              * mode             10 chars
@@ -206,16 +215,17 @@ int listArchive(int argc, char **argv, int verbose) {
                 owner,
                 convOctalStr(header.size),
                 mtimeBuf,
-                header.name);
+                name);
         } else {
-            printf("%s\n", header.name);
+            printf("%s\n", name);
         }
         if (header.typeflag == REGTYPE) {
             if(!extractFile(archive, &header, "/dev/null")) {
-                fprintf(stderr, "Error extracting %s\n", header.name);
+                fprintf(stderr, "Error extracting %s\n", name);
                 ret = 1;
             }
         }
+        memset(name, '\0', TNAMESIZE + TPREFIXSIZE);
     }
     fclose(archive);
     return ret;   
