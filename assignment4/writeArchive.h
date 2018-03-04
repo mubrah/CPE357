@@ -42,6 +42,7 @@
 #define WRITEARCHIVE_H
 
 int writeHeader(char *finputName, FILE *archive, struct stat *statBuf);
-int archiveData(char *finputName, FILE *archive);
+int archiveFile(char *finputName, FILE *archive);
+int archiveDir(char *dirName, FILE *archive, struct stat *statBuf, int verbose);
 int createArchive(int argc, char **argv, int verbose);
 #endif

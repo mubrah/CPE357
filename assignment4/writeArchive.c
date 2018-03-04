@@ -70,7 +70,7 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     return 1;
 }
 
-int archiveData(char *finputName, FILE *archive) {
+int archiveFile(char *finputName, FILE *archive) {
     FILE *finput;
     char readBuf[TBLOCKSIZE] = {0};
 
@@ -117,6 +117,43 @@ char *fixDirName(char *origDirName) {
     return fixedDirName;
 }   /* Must free fixedDirName */
 
+int archiveDir(char *dirName, FILE *archive, struct stat *statBuf, int verbose) {
+    DIR *dir = NULL;
+    struct dirent *dirEntry = NULL;
+    struct stat dirstatBuf;
+    struct stat curstatBuf;
+    char *fileName = NULL;
+
+    dirName = fixDirName(dirName);
+    writeHeader(dirName, archive, statBuf);
+    
+    dir = opendir(dirName);
+    stat(".", &curstatBuf);
+    stat(dirName, &dirstatBuf);
+    while ((dirEntry = readdir(dir))) {
+        if ((dirEntry->d_ino != dirstatBuf.st_ino) &&
+            (dirEntry->d_ino != curstatBuf.st_ino) &&
+            (dirEntry->d_name[0] != '.')) {
+                fileName = appendStr(dirName, dirEntry->d_name);
+                if (verbose)
+                    printf("%s\n", fileName);
+                
+                lstat(fileName, statBuf);
+                if (S_ISREG(statBuf->st_mode) > 0) {
+                    writeHeader(fileName, archive, statBuf);
+                    archiveFile(fileName, archive);           
+                } else if (S_ISLNK(statBuf->st_mode) > 0) {
+                    writeHeader(fileName, archive, statBuf);                    
+                } else if (S_ISDIR(statBuf->st_mode) > 0) {
+                    archiveDir(fileName, archive, statBuf, verbose);
+                }
+                free(fileName);
+            }
+    }
+    closedir(dir);
+    free(dirName);
+}
+
 /* bool verbose */
 int createArchive(int argc, char **argv, int verbose) {
     FILE *archive;
@@ -127,42 +164,17 @@ int createArchive(int argc, char **argv, int verbose) {
     for (i = 3; i < argc; i++) {
         struct stat statBuf;
 
-        if (verbose)
+        if (verbose) {
             printf("%s\n", argv[i]);
+        }
         lstat(argv[i], &statBuf);
         if (S_ISREG(statBuf.st_mode) > 0) {
             writeHeader(argv[i], archive, &statBuf);
-            archiveData(argv[i], archive);
+            archiveFile(argv[i], archive);
         } else if (S_ISLNK(statBuf.st_mode) > 0) {
             writeHeader(argv[i], archive, &statBuf);
         } else if (S_ISDIR(statBuf.st_mode) > 0) {  
-            DIR *dir = NULL;
-            struct dirent *dirEntry = NULL;
-            struct stat dirstatBuf;
-            struct stat curstatBuf;
-            char *dirName = NULL;
-            char *fileName = NULL;
-
-            dirName = fixDirName(argv[i]);
-            writeHeader(dirName, archive, &statBuf);
-            
-            dir = opendir(dirName);
-            stat(".", &curstatBuf);
-            stat(dirName, &dirstatBuf);
-            while ((dirEntry = readdir(dir))) {
-                if ((dirEntry->d_ino != dirstatBuf.st_ino) &&
-                    (dirEntry->d_ino != curstatBuf.st_ino)) {
-                        fileName = appendStr(dirName, dirEntry->d_name);
-                        if (verbose)
-                            printf("%s\n", fileName);
-                        lstat(fileName, &statBuf);
-                        writeHeader(fileName, archive, &statBuf);
-                        archiveData(fileName, archive);
-                        free(fileName);
-                    }
-            }
-            closedir(dir);
-            free(dirName);
+            archiveDir(argv[i], archive, &statBuf, verbose);
         }
     }
     fwrite(emptyBlock, TBLOCKSIZE, 1, archive);
