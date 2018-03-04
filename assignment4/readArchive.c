@@ -205,7 +205,7 @@ int listArchive(int argc, char **argv, int verbose) {
             time = localtime(&mtime);
             sprintf(mtimeBuf, "%04i-%02i-%02i %02i:%02i",
                 1900 + time->tm_year,
-                time->tm_mon,
+                time->tm_mon + 1,
                 time->tm_mday,
                 time->tm_hour,
                 time->tm_min);
