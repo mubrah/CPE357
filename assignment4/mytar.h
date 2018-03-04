@@ -23,6 +23,7 @@
 
 #define TBLOCKSIZE 512
 #define TNAMESIZE 100
+#define TPREFIXSIZE 155
 
 /* tar Header Block, from POSIX 1003.1-1990.  */
 
@@ -44,7 +45,7 @@ struct tarHeader {              /* byte offset */
   char gname[32];               /* 297 */
   char devmajor[8];             /* 329 */
   char devminor[8];             /* 337 */
-  char prefix[155];             /* 345 */
+  char prefix[TPREFIXSIZE];     /* 345 */
   char padding[12];             /* 500 */
 };
 

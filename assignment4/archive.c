@@ -6,10 +6,20 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     struct passwd *user = NULL;
     struct group *group = NULL;
     int checksum, i;
+    int nameLen = strlen(finputName);
 
-
-    /* TODO: Get name from "path" as provided */
-    strcpy(header.name, finputName);
+    
+    if (nameLen > TNAMESIZE) {
+        char nameOverflow[TPREFIXSIZE] = {0};
+        
+        strncpy(header.name, finputName, TNAMESIZE);
+        for (i = TNAMESIZE; finputName[i]; i++) {
+            nameOverflow[i - TNAMESIZE] = finputName[i];
+        }
+        strncpy(header.prefix, nameOverflow, TPREFIXSIZE);
+    } else {
+        strcpy(header.name, finputName);
+    }
     
     sprintf(header.mode, "%07o", statBuf->st_mode);
     header.mode[0] = '0';
@@ -43,8 +53,6 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     strcpy(header.gname, group->gr_name);
 
     /* Header devmajor and devminor not implemented */
-
-    /* Prefix */
 
     for (i = 0; i < sizeof(struct tarHeader); i++) {
         checksum += *_header;
