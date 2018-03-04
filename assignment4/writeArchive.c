@@ -1,7 +1,7 @@
 #include "writeArchive.h"
 
 int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
-    struct tarHeader header = {0};
+    struct tarHeader header = {'\0'};
     unsigned char *_header = (unsigned char *)&header;
     struct passwd *user = NULL;
     struct group *group = NULL;
@@ -11,7 +11,7 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     /* Header devmajor and devminor not implemented */
     
     if (nameLen > TNAMESIZE) {
-        char nameOverflow[TNAMESIZE] = {0};
+        char nameOverflow[TNAMESIZE] = {'\0'};
         
         strncpy(header.prefix, finputName, TPREFIXSIZE);
         for (i = TPREFIXSIZE; finputName[i]; i++) {
