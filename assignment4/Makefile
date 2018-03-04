@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g -ansi -pedantic 
-HEADERS = mytar.h archive.h extract.h
-SOURCES = mytar.c archive.c extract.c
+HEADERS = mytar.h writeArchive.h readArchive.h
+SOURCES = mytar.c writeArchive.c readArchive.c
 .PHONY: clean
 
 mytar : $(SOURCES) $(HEADERS)

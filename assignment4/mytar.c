@@ -1,6 +1,6 @@
 #include "mytar.h"
-#include "archive.h"
-#include "extract.h"
+#include "writeArchive.h"
+#include "readArchive.h"
 
 int getOption(char *options) {
     int c=0, t=0, x=0, f=0, v=0, i=0, ret = 0;
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         } else if (operation == (int)('c' + 'f' + 'v')) {
             return createArchive(argc, argv, 1);
         } else if (operation == (int)('t' + 'f')) {
-            return listArchive(argc, argv);
+            return listArchive(argc, argv, 0);
         } else if (operation == (int)('t' + 'f' + 'v')) {
             return listArchive(argc, argv, 1);
         } else if (operation == (int)('x' + 'f')) {
