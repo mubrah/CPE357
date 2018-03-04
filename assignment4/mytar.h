@@ -24,6 +24,7 @@
 #define TBLOCKSIZE 512
 #define TNAMESIZE 100
 #define TPREFIXSIZE 155
+#define TCHECKSUMSIZE 8
 
 /* tar Header Block, from POSIX 1003.1-1990.  */
 
@@ -36,7 +37,7 @@ struct tarHeader {              /* byte offset */
   char gid[8];                  /* 116 */
   char size[12];                /* 124 */
   char mtime[12];               /* 136 */
-  char chksum[8];               /* 148 */
+  char chksum[TCHECKSUMSIZE];   /* 148 */
   char typeflag;                /* 156 */
   char linkname[TNAMESIZE];     /* 157 */
   char magic[6];                /* 257 */

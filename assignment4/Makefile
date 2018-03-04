@@ -8,4 +8,4 @@ mytar : $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) -o mytar $(SOURCES) -lm
 
 clean:
-	rm -f *.o test.tar output
+	rm -f *.o *.tar test/*.tar 

@@ -5,7 +5,7 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     unsigned char *_header = (unsigned char *)&header;
     struct passwd *user = NULL;
     struct group *group = NULL;
-    int checksum, i;
+    int checksum=0, i=0;
     int nameLen = strlen(finputName);
 
     
@@ -54,10 +54,11 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
 
     /* Header devmajor and devminor not implemented */
 
-    for (i = 0; i < sizeof(struct tarHeader); i++) {
+    for (i = 0; i < TBLOCKSIZE; i++) {
         checksum += *_header;
         _header++;
     }
+    checksum += TCHECKSUMSIZE * ' ';    /* Checksum field is rep. with spaces */
     sprintf(header.chksum, "%07o", checksum);
 
     if (archive == NULL) {
