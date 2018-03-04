@@ -4,6 +4,7 @@
 fw
 hencode
 hdecode
+mytar
 
 # Prerequisites
 *.d
