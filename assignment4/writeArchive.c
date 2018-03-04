@@ -8,6 +8,7 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     int checksum=0, i=0;
     int nameLen = strlen(finputName);
 
+    /* Header devmajor and devminor not implemented */
     
     if (nameLen > TNAMESIZE) {
         char nameOverflow[TPREFIXSIZE] = {0};
@@ -37,9 +38,11 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
         sprintf(header.size, "%011lo", statBuf->st_size);    
     } else if (S_ISLNK(statBuf->st_mode) > 0) {
         header.typeflag = SYMTYPE;
+        strcpy(header.size, "00000000000");
         readlink(finputName, header.linkname, TNAMESIZE);
     } else if (S_ISDIR(statBuf->st_mode) > 0) {
         header.typeflag = DIRTYPE;
+        strcpy(header.size, "00000000000");
     }
     
     strcpy(header.magic, TMAGIC);
@@ -51,8 +54,6 @@ int writeHeader(char *finputName, FILE *archive, struct stat *statBuf) {
     
     group = getgrgid(statBuf->st_gid);
     strcpy(header.gname, group->gr_name);
-
-    /* Header devmajor and devminor not implemented */
 
     for (i = 0; i < TBLOCKSIZE; i++) {
         checksum += *_header;
