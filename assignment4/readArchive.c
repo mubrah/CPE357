@@ -96,45 +96,6 @@ void createName(char *nameBuffer, char *prefix, char *name) {
     }
 }
 
-/* bool verbose */
-int extractArchive(int argc, char **argv, int verbose) {
-    FILE *archive = NULL;
-    struct tarHeader header = {0};
-    int ret = 0;
-    char name[TNAMESIZE + TPREFIXSIZE] = {'\0'};
-
-    archive = fopen(argv[2], "rb");
-    while (readHeader(archive, &header) != 0) {
-        createName(&name, header.prefix, header.name);
-
-        if (verbose) {
-            printf("%s\n", name);
-        }
-        switch (header.typeflag) {
-            case REGTYPE:
-                if(!extractFile(archive, &header, name)) {
-                    fprintf(stderr, "Error extracting %s\n", name);
-                    ret = 1;
-                }
-                break;
-            case SYMTYPE:
-                if (!extractSym(archive, &header)) {
-                    fprintf(stderr, "Error extracting %s\n", name);
-                    ret = 1;                
-                }
-                break;
-            case DIRTYPE:
-                if(!extractDir(archive, &header)) {
-                    fprintf(stderr, "Error extracting %s\n", name);
-                    ret = 1;
-                }
-                break;
-        }
-    }
-    fclose(archive);
-    return ret;
-}
-
 int topStrContains(char *base, char *key) {
     int keyLen = strlen(key);
     char _base[keyLen + 1];
@@ -149,8 +110,68 @@ int topStrContains(char *base, char *key) {
     return ret;
 }
 
+/* Actual logic of 'x' flag. This extracts files from the archive */
+int __extractArchive(char *name, FILE *archive, struct tarHeader *header,
+        int verbose) {
+    int ret = 0;
+
+    if (verbose) {
+        printf("%s\n", name);
+    }
+    switch (header->typeflag) {
+        case REGTYPE:
+            if(!extractFile(archive, header, name)) {
+                fprintf(stderr, "Error extracting %s\n", name);
+                ret = 1;
+            }
+            break;
+        case SYMTYPE:
+            if (!extractSym(archive, header)) {
+                fprintf(stderr, "Error extracting %s\n", name);
+                ret = 1;                
+            }
+            break;
+        case DIRTYPE:
+            if(!extractDir(archive, header)) {
+                fprintf(stderr, "Error extracting %s\n", name);
+                ret = 1;
+            }
+            break;
+    }
+    return ret;
+}
+
+/* bool verbose */
+int extractArchive(int argc, char **argv, int verbose) {
+    FILE *archive = NULL;
+    struct tarHeader header = {0};
+    int ret = 0, i;
+    char name[TNAMESIZE + TPREFIXSIZE] = {'\0'};
+
+    archive = fopen(argv[2], "rb");
+    while (readHeader(archive, &header) != 0) {
+        createName(&name, header.prefix, header.name);
+
+        if (argc > 3) {
+            for (i = 3; i < argc; i++) {
+                if (topStrContains(&name, argv[i]) == 0) {
+                    ret = __extractArchive(&name, archive, &header, verbose);
+                } else {
+                    if (header.typeflag == REGTYPE) {
+                        extractFile(archive, &header, "/dev/null");
+                    }
+                }
+            }
+        } else {
+            ret = __extractArchive(&name, archive, &header, verbose);
+        }
+    }
+    fclose(archive);
+    return ret;
+}
+
 /* Actual logic of 't' flag. This prints the "Table of Contents" */
-int __listArchive(char *name, struct tarHeader *header, int verbose) {
+void __listArchive(char *name, struct tarHeader *header, int verbose) {
     if (verbose) {
         /* Verbose Contents listing follows the following format
         * mode             10 chars
