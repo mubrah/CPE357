@@ -37,8 +37,7 @@ int getNextCharOffset(char *current, char *delimiter) {
 /* assert 0th char of command is first char of cmd after ' | ' */
 int main(int argc, char **argv) {
     struct cmd stages[MAXCMDS];
-    char outBuf[2000] = {'\0'};
-    char cmdBuf[CLILEN] = "ls a b < inputFile > outputFile x y | less | more p oo p";/*{'\0'}; */
+    char cmdBuf[CLILEN] = {'\0'};
     char *_cmdBuf = &cmdBuf;
     char cmdBufOrig[CLILEN] = {'\0'};
     char *_cmdBufOrig = &cmdBufOrig;
@@ -49,7 +48,7 @@ int main(int argc, char **argv) {
 
     
     printf("line: ");
-    /*scanf("%[^\n\r]", cmdBuf);*/
+    scanf("%[^\n\r]", cmdBuf);
     strcpy(cmdBufOrig, cmdBuf);
 
 
@@ -62,9 +61,6 @@ int main(int argc, char **argv) {
         if (nextPipeOffset < 0) {
             nextPipeOffset = strlen(_cmdBuf);
             lastOperation = 1;
-        } else if (nextPipeOffset == 0) {
-            fprintf(stderr, "invalid null command");
-            exit(1);
         }
 
         if ((*_cmdBuf == '|') ||
@@ -97,6 +93,11 @@ int main(int argc, char **argv) {
                 token = strtok(NULL, argDlm);
                 _argc++;
             }
+
+            if ((token != NULL) && (!strcmp(token, "|"))) {
+                fprintf(stderr, "invalud null command\n");
+                exit(1);
+            }
         }
 
         stages[stageNum].cmd = _cmdBufOrig;
@@ -121,7 +122,7 @@ int main(int argc, char **argv) {
         
         if (_stageNum) {
             if (stage->input != NULL) {
-                fprintf(stderr, "ambiguous input");
+                fprintf(stderr, "ambiguous input\n");
             }
             sprintf(inMsg, "%s %i", "pipe from stage", _stageNum - 1);
             stage->input = inMsg;
