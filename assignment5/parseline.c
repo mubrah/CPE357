@@ -1,9 +1,21 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define CLILEN     512
 #define MAXCMDS     10
 #define MAXARGS     10
+
+struct cmd {
+    char *cmd;
+    int cmdLen;
+    char *input;
+    int inputLen;
+    char *output;
+    int outputLen;
+    int argc;
+    char *argv[MAXCMDS * MAXARGS];
+};
 
 /* Takes null-terminated delimiter. Returns -1 if no delimiters found */
 int getNextCharOffset(char *current, char *delimiter) {
@@ -24,31 +36,27 @@ int getNextCharOffset(char *current, char *delimiter) {
 
 /* assert 0th char of command is first char of cmd after ' | ' */
 int main(int argc, char **argv) {
-    char cmdBuf[CLILEN] = {'\0'};
+    struct cmd stages[MAXCMDS];
+    char outBuf[2000] = {'\0'};
+    char cmdBuf[CLILEN] = "ls a b < inputFile > outputFile x y | less | more p oo p";/*{'\0'}; */
     char *_cmdBuf = &cmdBuf;
     char cmdBufOrig[CLILEN] = {'\0'};
     char *_cmdBufOrig = &cmdBufOrig;
     char *token=NULL;
     char argDlm[2] = " \0";
-    char stageBuf[CLILEN] = {'\0'};
-    int stageNum = 0;
-    int ret = 0;
+    int stageNum=0, _stageNum, argsIdx = 0, ret = 0;
+
 
     
     printf("line: ");
-    scanf("%[^\n\r]", cmdBuf);
+    /*scanf("%[^\n\r]", cmdBuf);*/
     strcpy(cmdBufOrig, cmdBuf);
 
 
     
     while (!ret) {
-        int nextPipeOffset=0, redirInOffset=0, redirOutOffset=0;
+        int nextPipeOffset=0, lastOperation=0, _argc=0;
         char *input=NULL, *output=NULL;
-        char origInput[] = "original stdin";
-        char origOutput[] = "original stdout";
-        char *stageArgs[MAXARGS];
-        int argsIdx=0, i=0, lastOperation = 0;
-
 
         if ((*_cmdBuf == '|') ||
             (*_cmdBuf == ' ') ||
@@ -67,38 +75,34 @@ int main(int argc, char **argv) {
         while ((token != NULL) && (token < _cmdBuf + nextPipeOffset)) {
             if (!strcmp(token, "<")) {
                 token = strtok(NULL, argDlm);
+                if (input != NULL) {
+                    fprintf(stderr, "bad input redirection\n");
+                    exit(1);
+                }
                 input = token;
                 token = strtok(NULL, argDlm);
             } else if (!strcmp(token, ">")) {
                 token = strtok(NULL, argDlm);
+                if (output != NULL) {
+                    fprintf(stderr, "bad input redirection\n");
+                    exit(1);                    
+                }
                 output = token;
                 token = strtok(NULL, argDlm);
             } else {
-                stageArgs[argsIdx] = token;
+                stages[stageNum].argv[argsIdx] = token;
                 token = strtok(NULL, argDlm);
                 argsIdx++;
+                _argc++;
             }
         }
 
-        input  = input  ? input  : origInput;
-        output = output ? output : origOutput;
+        stages[stageNum].cmd = _cmdBufOrig;
+        stages[stageNum].cmdLen = nextPipeOffset;
+        stages[stageNum].input = input;
+        stages[stageNum].output = output;
+        stages[stageNum].argc = _argc;
 
-        printf("\n");
-        printf("--------\n");
-        printf("Stage %i: \"", stageNum);
-        fwrite(_cmdBufOrig, sizeof(char), nextPipeOffset, stdout);
-        printf("\"\n");
-        printf("--------\n");
-        printf("%10s: %s\n", "input", input);
-        printf("%10s: %s\n", "output", output);
-        printf("%10s: %i\n", "argc", argsIdx);
-        printf("%10s: ", "argv");
-        for (i = 0; i < (argsIdx - 1); i++) {
-            printf("\"%s\",", stageArgs[i]);
-        }
-        printf("\"%s\"\n", stageArgs[i]);
-        
-        memset(stageBuf, '\0', CLILEN);
         _cmdBuf += nextPipeOffset;
         _cmdBufOrig += nextPipeOffset + 3,
         stageNum++;
@@ -106,5 +110,53 @@ int main(int argc, char **argv) {
             break;
         }
     }
+
+    for (_stageNum = 0; _stageNum < stageNum; _stageNum++) {
+        char inMsg[2000] = {'\0'};
+        char outMsg[2000] = {'\0'};
+        int j = 0;
+        struct cmd *stage = &stages[_stageNum];
+        
+        if (_stageNum) {
+            if (stage->input != NULL) {
+                fprintf(stderr, "ambiguous input");
+            }
+            sprintf(inMsg, "%s %i", "pipe from stage", _stageNum - 1);
+            stage->input = inMsg;
+        } else {
+            if (stage->input == NULL) {
+                strcpy(inMsg, "original standard input");
+                stage->input = inMsg;
+            }
+        }
+
+        if (_stageNum != stageNum - 1) {
+            sprintf(outMsg, "%s %i", "pipe to stage", _stageNum + 1);
+            stage->output = outMsg;
+        } else {
+            if (stage->output == NULL) {
+                strcpy(outMsg, "original standard output");
+                stage->output = outMsg;
+            }
+        }
+        
+
+
+        printf("\n");
+        printf("--------\n");
+        printf("Stage %i: \"", _stageNum);
+        fwrite(stage->cmd, sizeof(char), stage->cmdLen, stdout);
+        printf("\"\n");
+        printf("--------\n");
+        printf("%10s: %s\n", "input", stage->input);
+        printf("%10s: %s\n", "output", stage->output);
+        printf("%10s: %i\n", "argc", stage->argc);
+        printf("%10s: ", "argv");
+        for (j = 0; j < stage->argc - 1; j++) {
+            printf("\"%s\",", stage->argv[j]);
+        }
+        printf("\"%s\"\n", stage->argv[stage->argc - 1]);
+    }
+
     return ret;
 }
