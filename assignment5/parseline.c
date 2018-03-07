@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     char *_cmdBufOrig = &cmdBufOrig;
     char *token=NULL;
     char argDlm[2] = " \0";
-    int stageNum=0, _stageNum, argsIdx = 0, ret = 0;
+    int stageNum=0, _stageNum, ret = 0;
 
 
     
@@ -58,17 +58,20 @@ int main(int argc, char **argv) {
         int nextPipeOffset=0, lastOperation=0, _argc=0;
         char *input=NULL, *output=NULL;
 
+        nextPipeOffset = getNextCharOffset(_cmdBuf, " | \0");
+        if (nextPipeOffset < 0) {
+            nextPipeOffset = strlen(_cmdBuf);
+            lastOperation = 1;
+        } else if (nextPipeOffset == 0) {
+            fprintf(stderr, "invalid null command");
+            exit(1);
+        }
+
         if ((*_cmdBuf == '|') ||
             (*_cmdBuf == ' ') ||
             (*_cmdBuf == '\0')) {
                 _cmdBuf++;
                 continue;
-        }
-
-        nextPipeOffset = getNextCharOffset(_cmdBuf, " | \0");
-        if (nextPipeOffset < 0) {
-            nextPipeOffset = strlen(_cmdBuf);
-            lastOperation = 1;
         }
 
         token = strtok(_cmdBuf, argDlm);
@@ -90,9 +93,8 @@ int main(int argc, char **argv) {
                 output = token;
                 token = strtok(NULL, argDlm);
             } else {
-                stages[stageNum].argv[argsIdx] = token;
+                stages[stageNum].argv[_argc] = token;
                 token = strtok(NULL, argDlm);
-                argsIdx++;
                 _argc++;
             }
         }
