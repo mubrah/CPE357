@@ -31,7 +31,7 @@ void parseCommand(struct cmd *stage, char **_cmdBuf, char **_cmdBufOrig,
         int *stageNum, int nextPipeOffset);
 int parseLine(struct cmd *stages, char *cmdBuf, char *_cmdBuf,
     char *cmdBufOrig, char *_cmdBufOrig);
-void printParsedCommands(struct cmd *stage, int _stageNum);
+void printParsedCommands(struct cmd *stage, int _stageNum, int lastOperation);
 void dumpParsedCommands(struct cmd *stage, int stageNum, int _stageNum);
 int main(int argc, char **argv);
 

@@ -94,6 +94,7 @@ int parseLine(struct cmd *stages, char *cmdBuf, char *_cmdBuf,
 
         parseCommand(&stages[stageNum], &_cmdBuf, &_cmdBufOrig, &stageNum,
             nextPipeOffset);
+
         if (lastOperation) {
             break;
         }
@@ -101,14 +102,22 @@ int parseLine(struct cmd *stages, char *cmdBuf, char *_cmdBuf,
     return stageNum;
 }
 
-void printParsedCommands(struct cmd *stage, int _stageNum) {
+void printParsedCommands(struct cmd *stage, int _stageNum, int lastOperation) {
     int i  = 0;
     
     printf("\n");
     printf("--------\n");
-    printf("Stage %i: \" ", _stageNum);
+    if (_stageNum) {
+        printf("Stage %i: \" ", _stageNum);    
+    } else {
+        printf("Stage %i: \"", _stageNum);
+    }
     fwrite(stage->cmd, sizeof(char), stage->cmdLen, stdout);
-    printf(" \"\n");
+    if (lastOperation) {
+        printf(" \"\n");
+    } else {
+        printf("\"\n");
+    }
     printf("--------\n");
     printf("%10s: %s\n", "input", stage->input);
     printf("%10s: %s\n", "output", stage->output);
@@ -152,12 +161,12 @@ void dumpParsedCommands(struct cmd *stage, int stageNum, int _stageNum) {
             stage->output = outMsg;
         }
     }
-    printParsedCommands(stage, _stageNum);
+    printParsedCommands(stage, _stageNum, stageNum - 1 - _stageNum);
 }
 
 int main(int argc, char **argv) {
     struct cmd stages[MAXCMDS];
-    char cmdBuf[CLILEN] = {'\0'};
+    char cmdBuf[CLILEN] = "a | b | c";/*{'\0'};*/ /* TODO: traling '| '*/
     char *_cmdBuf = (char *)&cmdBuf;
     char cmdBufOrig[CLILEN] = {'\0'};
     char *_cmdBufOrig = (char *)&cmdBufOrig;
@@ -167,7 +176,7 @@ int main(int argc, char **argv) {
 
     
     printf("line: ");
-    scanf("%[^\n\r]", cmdBuf);
+    /*scanf("%[^\n\r]", cmdBuf);*/
     if (strlen(cmdBuf) > CLILEN) {
         fprintf(stderr, "command too long\n");
         exit(1);
