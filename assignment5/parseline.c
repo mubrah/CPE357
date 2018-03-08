@@ -156,6 +156,10 @@ int main(int argc, char **argv) {
         }
 
         if (_stageNum != stageNum - 1) {
+            if (stage->output != NULL) {
+                fprintf(stderr, "ambiguous output\n");
+                exit(1);
+            }
             sprintf(outMsg, "%s %i", "pipe to stage", _stageNum + 1);
             stage->output = outMsg;
         } else {
