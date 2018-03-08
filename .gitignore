@@ -5,6 +5,7 @@ fw
 hencode
 hdecode
 mytar
+parseline
 
 # Prerequisites
 *.d
