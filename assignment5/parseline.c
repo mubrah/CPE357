@@ -63,8 +63,7 @@ int main(int argc, char **argv) {
             lastOperation = 1;
         }
 
-        if ((*_cmdBuf == '|') ||
-            (*_cmdBuf == ' ') ||
+        if ((*_cmdBuf == ' ') ||
             (*_cmdBuf == '\0')) {
                 _cmdBuf++;
                 continue;
@@ -89,15 +88,15 @@ int main(int argc, char **argv) {
                 output = token;
                 token = strtok(NULL, argDlm);
             } else {
+                if (!strcmp(token, "|")) {
+                    fprintf(stderr, "invalid null command\n");
+                    exit(1);
+                }
                 stages[stageNum].argv[_argc] = token;
                 token = strtok(NULL, argDlm);
                 _argc++;
             }
-
-            if ((token != NULL) && (!strcmp(token, "|"))) {
-                fprintf(stderr, "invalud null command\n");
-                exit(1);
-            }
+            
         }
 
         stages[stageNum].cmd = _cmdBufOrig;
@@ -106,7 +105,7 @@ int main(int argc, char **argv) {
         stages[stageNum].output = output;
         stages[stageNum].argc = _argc;
 
-        _cmdBuf += nextPipeOffset;
+        _cmdBuf += nextPipeOffset + 2;
         _cmdBufOrig += nextPipeOffset + 3,
         stageNum++;
         if (lastOperation) {
@@ -122,7 +121,9 @@ int main(int argc, char **argv) {
         
         if (_stageNum) {
             if (stage->input != NULL) {
+                /* Need to check this outside of loop */
                 fprintf(stderr, "ambiguous input\n");
+                exit(1);
             }
             sprintf(inMsg, "%s %i", "pipe from stage", _stageNum - 1);
             stage->input = inMsg;
