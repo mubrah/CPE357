@@ -92,7 +92,8 @@ int parseLine(struct cmd *stages, char *cmdBuf, char *_cmdBuf,
                 continue;
         }
 
-        parseCommand(&stages[stageNum], &_cmdBuf, &_cmdBufOrig, &stageNum, nextPipeOffset);
+        parseCommand(&stages[stageNum], &_cmdBuf, &_cmdBufOrig, &stageNum,
+            nextPipeOffset);
         if (lastOperation) {
             break;
         }
