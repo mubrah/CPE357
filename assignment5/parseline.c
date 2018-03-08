@@ -1,21 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define CLILEN     512
-#define MAXCMDS     10
-#define MAXARGS     10
-
-struct cmd {
-    char *cmd;
-    int cmdLen;
-    char *input;
-    int inputLen;
-    char *output;
-    int outputLen;
-    int argc;
-    char *argv[MAXCMDS * MAXARGS];
-};
+#include "parseline.h"
 
 /* Takes null-terminated delimiter. Returns -1 if no delimiters found */
 int getNextCharOffset(char *current, char *delimiter) {
@@ -34,34 +17,68 @@ int getNextCharOffset(char *current, char *delimiter) {
     return -1;
 }
 
-int main(int argc, char **argv) {
-    struct cmd stages[MAXCMDS];
-    char cmdBuf[CLILEN] = {'\0'};
-    char *_cmdBuf = &cmdBuf;
-    char cmdBufOrig[CLILEN] = {'\0'};
-    char *_cmdBufOrig = &cmdBufOrig;
+void parseCommand(struct cmd *stage, char **_cmdBuf, char **_cmdBufOrig,
+        int *stageNum, int nextPipeOffset) {
     char *token=NULL;
     char argDlm[2] = " \0";
-    int stageNum=0, _stageNum, ret = 0;
+    char *input=NULL, *output=NULL;
+    int _argc = 0;
 
+    token = strtok(*_cmdBuf, argDlm);
+    while ((token != NULL) && (token < *_cmdBuf + nextPipeOffset)) {
+        if (*stageNum >= MAXCMDS) {
+            fprintf(stderr, "pipeline too deep\n");
+            exit(1);
+        }
 
-    
-    printf("line: ");
-    scanf("%[^\n\r]", cmdBuf);
-    if (strlen(cmdBuf) > CLILEN) {
-        fprintf(stderr, "command too long\n");
-        exit(1);
-    } else if (strlen(cmdBuf) == 0) {
-        fprintf(stderr, "invalid null command\n");
-        exit(1);
+        if (!strcmp(token, "<")) {
+            if (input != NULL) {
+                fprintf(stderr, "bad input redirection\n");
+                exit(1);
+            }
+            token = strtok(NULL, argDlm);
+            input = token;
+            token = strtok(NULL, argDlm);
+        } else if (!strcmp(token, ">")) {
+            if (output != NULL) {
+                fprintf(stderr, "bad input redirection\n");
+                exit(1);                    
+            }
+            token = strtok(NULL, argDlm);
+            output = token;
+            token = strtok(NULL, argDlm);
+        } else {
+            if (!strcmp(token, "|")) {
+                fprintf(stderr, "invalid null command\n");
+                exit(1);
+            }
+            if (_argc >= MAXARGS) {
+                fprintf(stderr, "too nany arguments\n");
+                exit(1);
+            }
+            stage->argv[_argc] = token;
+            token = strtok(NULL, argDlm);
+            _argc++;
+        }
     }
-    strcpy(cmdBufOrig, cmdBuf);
 
+    stage->cmd = *_cmdBufOrig;
+    stage->cmdLen = nextPipeOffset;
+    stage->input = input;
+    stage->output = output;
+    stage->argc = _argc;
 
-    
-    while (!ret) {
-        int nextPipeOffset=0, lastOperation=0, _argc=0;
-        char *input=NULL, *output=NULL;
+    *_cmdBuf += nextPipeOffset + 2;
+    *_cmdBufOrig += nextPipeOffset + 3,
+    (*stageNum)++;
+}
+
+int parseLine(struct cmd *stages, char *cmdBuf, char *_cmdBuf,
+        char *cmdBufOrig, char *_cmdBufOrig) {
+    int stageNum = 0;
+
+    while (1) {
+        int nextPipeOffset=0, lastOperation=0;
 
         nextPipeOffset = getNextCharOffset(_cmdBuf, " | \0");
         if (nextPipeOffset < 0) {
@@ -75,111 +92,97 @@ int main(int argc, char **argv) {
                 continue;
         }
 
-        token = strtok(_cmdBuf, argDlm);
-        while ((token != NULL) && (token < _cmdBuf + nextPipeOffset)) {
-            if (stageNum >= MAXCMDS) {
-                fprintf(stderr, "pipeline too deep\n");
-                exit(1);
-            }
-
-            if (!strcmp(token, "<")) {
-                if (input != NULL) {
-                    fprintf(stderr, "bad input redirection\n");
-                    exit(1);
-                }
-                token = strtok(NULL, argDlm);
-                input = token;
-                token = strtok(NULL, argDlm);
-            } else if (!strcmp(token, ">")) {
-                if (output != NULL) {
-                    fprintf(stderr, "bad input redirection\n");
-                    exit(1);                    
-                }
-                token = strtok(NULL, argDlm);
-                output = token;
-                token = strtok(NULL, argDlm);
-            } else {
-                if (!strcmp(token, "|")) {
-                    fprintf(stderr, "invalid null command\n");
-                    exit(1);
-                }
-                if (_argc >= MAXARGS) {
-                    fprintf(stderr, "too nany arguments\n");
-                    exit(1);
-                }
-                stages[stageNum].argv[_argc] = token;
-                token = strtok(NULL, argDlm);
-                _argc++;
-            }
-            
-        }
-
-        stages[stageNum].cmd = _cmdBufOrig;
-        stages[stageNum].cmdLen = nextPipeOffset;
-        stages[stageNum].input = input;
-        stages[stageNum].output = output;
-        stages[stageNum].argc = _argc;
-
-        _cmdBuf += nextPipeOffset + 2;
-        _cmdBufOrig += nextPipeOffset + 3,
-        stageNum++;
+        parseCommand(&stages[stageNum], &_cmdBuf, &_cmdBufOrig, &stageNum, nextPipeOffset);
         if (lastOperation) {
             break;
         }
     }
+    return stageNum;
+}
 
-    for (_stageNum = 0; _stageNum < stageNum; _stageNum++) {
-        char inMsg[2000] = {'\0'};
-        char outMsg[2000] = {'\0'};
-        int j = 0;
-        struct cmd *stage = &stages[_stageNum];
-        
-        if (_stageNum) {
-            if (stage->input != NULL) {
-                /* Need to check this outside of loop */
-                fprintf(stderr, "ambiguous input\n");
-                exit(1);
-            }
-            sprintf(inMsg, "%s %i", "pipe from stage", _stageNum - 1);
+void printParsedCommands(struct cmd *stage, int _stageNum) {
+    int i  = 0;
+    
+    printf("\n");
+    printf("--------\n");
+    printf("Stage %i: \" ", _stageNum);
+    fwrite(stage->cmd, sizeof(char), stage->cmdLen, stdout);
+    printf(" \"\n\0");
+    printf("--------\n");
+    printf("%10s: %s\n\0", "input", stage->input);
+    printf("%10s: %s\n\0", "output", stage->output);
+    printf("%10s: %i\n", "argc", stage->argc);
+    printf("%10s: ", "argv");
+    for (i = 0; i < stage->argc - 1; i++) {
+        printf("\"%s\",", stage->argv[i]);
+    }
+    printf("\"%s\"\n\0", stage->argv[stage->argc - 1]);
+}
+
+void dumpParsedCommands(struct cmd *stage, int stageNum, int _stageNum) {
+    char inMsg[256] = {'\0'};
+    char outMsg[256] = {'\0'};
+    
+    if (_stageNum) {
+        if (stage->input != NULL) {
+            /* Need to check this outside of loop */
+            fprintf(stderr, "ambiguous input\n");
+            exit(1);
+        }
+        sprintf(inMsg, "%s %i", "pipe from stage", _stageNum - 1);
+        stage->input = inMsg;
+    } else {
+        if (stage->input == NULL) {
+            strcpy(inMsg, "original stdin");
             stage->input = inMsg;
-        } else {
-            if (stage->input == NULL) {
-                strcpy(inMsg, "original stdin");
-                stage->input = inMsg;
-            }
         }
-
-        if (_stageNum != stageNum - 1) {
-            if (stage->output != NULL) {
-                fprintf(stderr, "ambiguous output\n");
-                exit(1);
-            }
-            sprintf(outMsg, "%s %i", "pipe to stage", _stageNum + 1);
-            stage->output = outMsg;
-        } else {
-            if (stage->output == NULL) {
-                strcpy(outMsg, "original stdout");
-                stage->output = outMsg;
-            }
-        }
-        
-
-
-        printf("\n");
-        printf("--------\n");
-        printf("Stage %i: \" ", _stageNum);
-        fwrite(stage->cmd, sizeof(char), stage->cmdLen, stdout);
-        printf(" \"\n");
-        printf("--------\n");
-        printf("%10s: %s\n", "input", stage->input);
-        printf("%10s: %s\n", "output", stage->output);
-        printf("%10s: %i\n", "argc", stage->argc);
-        printf("%10s: ", "argv");
-        for (j = 0; j < stage->argc - 1; j++) {
-            printf("\"%s\",", stage->argv[j]);
-        }
-        printf("\"%s\"\n", stage->argv[stage->argc - 1]);
     }
 
-    return ret;
+    if (_stageNum != stageNum - 1) {
+        if (stage->output != NULL) {
+            fprintf(stderr, "ambiguous output\n");
+            exit(1);
+        }
+        sprintf(outMsg, "%s %i", "pipe to stage", _stageNum + 1);
+        stage->output = outMsg;
+    } else {
+        if (stage->output == NULL) {
+            strcpy(outMsg, "original stdout");
+            stage->output = outMsg;
+        }
+    }
+    printParsedCommands(stage, _stageNum);
+}
+
+int main(int argc, char **argv) {
+    struct cmd stages[MAXCMDS];
+    char cmdBuf[CLILEN] = {'\0'};
+    char *_cmdBuf = &cmdBuf;
+    char cmdBufOrig[CLILEN] = {'\0'};
+    char *_cmdBufOrig = &cmdBufOrig;
+    int stageNum=0, _stageNum = 0;
+
+    memset(stages, '\0', MAXCMDS * sizeof(*stages));
+
+    
+    printf("line: ");
+    scanf("%[^\n\r]", cmdBuf);
+    if (strlen(cmdBuf) > CLILEN) {
+        fprintf(stderr, "command too long\n");
+        exit(1);
+    } else if (strlen(cmdBuf) == 0) {
+        fprintf(stderr, "invalid null command\n");
+        exit(1);
+    }
+    strcpy(cmdBufOrig, cmdBuf);
+
+    stageNum = parseLine(stages, cmdBuf, _cmdBuf, cmdBufOrig, _cmdBufOrig);
+
+    for (_stageNum = 0; _stageNum < stageNum; _stageNum++) {
+        struct cmd *stage = &stages[_stageNum];
+        
+        dumpParsedCommands(stage, stageNum, _stageNum);
+    }
+
+    return 0;
 }
