@@ -56,7 +56,6 @@ int main(int argc, char **argv) {
         fprintf(stderr, "invalid null command\n");
         exit(1);
     }
-    printf("%li\n", strlen(cmdBuf));
     strcpy(cmdBufOrig, cmdBuf);
 
 
