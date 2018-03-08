@@ -49,6 +49,10 @@ int main(int argc, char **argv) {
     
     printf("line: ");
     scanf("%[^\n\r]", cmdBuf);
+    if (CLILEN < strlen(cmdBuf)) {
+        fprintf(stderr, "command too long\n");
+        exit(1);
+    }
     strcpy(cmdBufOrig, cmdBuf);
 
 
@@ -71,25 +75,34 @@ int main(int argc, char **argv) {
 
         token = strtok(_cmdBuf, argDlm);
         while ((token != NULL) && (token < _cmdBuf + nextPipeOffset)) {
+            if (stageNum >= MAXCMDS) {
+                fprintf(stderr, "pipeline too deep\n");
+                exit(1);
+            }
+
             if (!strcmp(token, "<")) {
-                token = strtok(NULL, argDlm);
                 if (input != NULL) {
                     fprintf(stderr, "bad input redirection\n");
                     exit(1);
                 }
+                token = strtok(NULL, argDlm);
                 input = token;
                 token = strtok(NULL, argDlm);
             } else if (!strcmp(token, ">")) {
-                token = strtok(NULL, argDlm);
                 if (output != NULL) {
                     fprintf(stderr, "bad input redirection\n");
                     exit(1);                    
                 }
+                token = strtok(NULL, argDlm);
                 output = token;
                 token = strtok(NULL, argDlm);
             } else {
                 if (!strcmp(token, "|")) {
                     fprintf(stderr, "invalid null command\n");
+                    exit(1);
+                }
+                if (_argc >= MAXARGS) {
+                    fprintf(stderr, "too nany arguments\n");
                     exit(1);
                 }
                 stages[stageNum].argv[_argc] = token;
@@ -111,6 +124,11 @@ int main(int argc, char **argv) {
         if (lastOperation) {
             break;
         }
+    }
+
+    for (_stageNum = 0; _stageNum < stageNum; _stageNum++) {
+        struct cmd *stage = &stages[_stageNum];
+
     }
 
     for (_stageNum = 0; _stageNum < stageNum; _stageNum++) {
