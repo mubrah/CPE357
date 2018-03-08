@@ -166,7 +166,7 @@ void dumpParsedCommands(struct cmd *stage, int stageNum, int _stageNum) {
 
 int main(int argc, char **argv) {
     struct cmd stages[MAXCMDS];
-    char cmdBuf[CLILEN] = "a | b | c";/*{'\0'};*/ /* TODO: traling '| '*/
+    char cmdBuf[CLILEN] = {'\0'}; /* TODO: traling '| '*/
     char *_cmdBuf = (char *)&cmdBuf;
     char cmdBufOrig[CLILEN] = {'\0'};
     char *_cmdBufOrig = (char *)&cmdBufOrig;
@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
 
     
     printf("line: ");
-    /*scanf("%[^\n\r]", cmdBuf);*/
+    scanf("%[^\n\r]", cmdBuf);
     if (strlen(cmdBuf) > CLILEN) {
         fprintf(stderr, "command too long\n");
         exit(1);
