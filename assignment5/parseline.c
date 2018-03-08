@@ -34,7 +34,6 @@ int getNextCharOffset(char *current, char *delimiter) {
     return -1;
 }
 
-/* assert 0th char of command is first char of cmd after ' | ' */
 int main(int argc, char **argv) {
     struct cmd stages[MAXCMDS];
     char cmdBuf[CLILEN] = {'\0'};
@@ -130,11 +129,6 @@ int main(int argc, char **argv) {
     }
 
     for (_stageNum = 0; _stageNum < stageNum; _stageNum++) {
-        struct cmd *stage = &stages[_stageNum];
-
-    }
-
-    for (_stageNum = 0; _stageNum < stageNum; _stageNum++) {
         char inMsg[2000] = {'\0'};
         char outMsg[2000] = {'\0'};
         int j = 0;
@@ -173,9 +167,9 @@ int main(int argc, char **argv) {
 
         printf("\n");
         printf("--------\n");
-        printf("Stage %i: \"", _stageNum);
+        printf("Stage %i: \" ", _stageNum);
         fwrite(stage->cmd, sizeof(char), stage->cmdLen, stdout);
-        printf("\"\n");
+        printf(" \"\n");
         printf("--------\n");
         printf("%10s: %s\n", "input", stage->input);
         printf("%10s: %s\n", "output", stage->output);
