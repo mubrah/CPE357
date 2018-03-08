@@ -49,10 +49,14 @@ int main(int argc, char **argv) {
     
     printf("line: ");
     scanf("%[^\n\r]", cmdBuf);
-    if (CLILEN < strlen(cmdBuf)) {
+    if (strlen(cmdBuf) > CLILEN) {
         fprintf(stderr, "command too long\n");
         exit(1);
+    } else if (strlen(cmdBuf) == 0) {
+        fprintf(stderr, "invalid null command\n");
+        exit(1);
     }
+    printf("%li\n", strlen(cmdBuf));
     strcpy(cmdBufOrig, cmdBuf);
 
 
