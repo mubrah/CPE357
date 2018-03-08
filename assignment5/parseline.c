@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
             stage->input = inMsg;
         } else {
             if (stage->input == NULL) {
-                strcpy(inMsg, "original standard input");
+                strcpy(inMsg, "original stdin");
                 stage->input = inMsg;
             }
         }
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
             stage->output = outMsg;
         } else {
             if (stage->output == NULL) {
-                strcpy(outMsg, "original standard output");
+                strcpy(outMsg, "original stdout");
                 stage->output = outMsg;
             }
         }
