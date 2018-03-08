@@ -108,16 +108,16 @@ void printParsedCommands(struct cmd *stage, int _stageNum) {
     printf("--------\n");
     printf("Stage %i: \" ", _stageNum);
     fwrite(stage->cmd, sizeof(char), stage->cmdLen, stdout);
-    printf(" \"\n\0");
+    printf(" \"\n");
     printf("--------\n");
-    printf("%10s: %s\n\0", "input", stage->input);
-    printf("%10s: %s\n\0", "output", stage->output);
+    printf("%10s: %s\n", "input", stage->input);
+    printf("%10s: %s\n", "output", stage->output);
     printf("%10s: %i\n", "argc", stage->argc);
     printf("%10s: ", "argv");
     for (i = 0; i < stage->argc - 1; i++) {
         printf("\"%s\",", stage->argv[i]);
     }
-    printf("\"%s\"\n\0", stage->argv[stage->argc - 1]);
+    printf("\"%s\"\n", stage->argv[stage->argc - 1]);
 }
 
 void dumpParsedCommands(struct cmd *stage, int stageNum, int _stageNum) {
@@ -158,9 +158,9 @@ void dumpParsedCommands(struct cmd *stage, int stageNum, int _stageNum) {
 int main(int argc, char **argv) {
     struct cmd stages[MAXCMDS];
     char cmdBuf[CLILEN] = {'\0'};
-    char *_cmdBuf = &cmdBuf;
+    char *_cmdBuf = (char *)&cmdBuf;
     char cmdBufOrig[CLILEN] = {'\0'};
-    char *_cmdBufOrig = &cmdBufOrig;
+    char *_cmdBufOrig = (char *)&cmdBufOrig;
     int stageNum=0, _stageNum = 0;
 
     memset(stages, '\0', MAXCMDS * sizeof(*stages));
