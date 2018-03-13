@@ -1,4 +1,5 @@
 .vscode/
+*.swp
 
 # Ignore Project Executables
 fw
