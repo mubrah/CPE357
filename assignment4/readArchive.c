@@ -83,11 +83,15 @@ void createName(char *nameBuffer, char *prefix, char *name) {
     char *_name = nameBuffer;
     int prefixLen = 0;
 
-    memset(nameBuffer, '\0', TNAMESIZE + TPREFIXSIZE);
+    memset(nameBuffer, '\0', TNAMESIZE + TPREFIXSIZE + 1);
     if ((prefixLen = strlen(prefix)) >= TPREFIXSIZE) {
         strncpy(_name, prefix, TPREFIXSIZE);
     } else {
         strcpy(_name, prefix);
+    }
+    if (prefixLen > 0) {
+        _name[prefixLen] = '/';
+        prefixLen++;
     }
     if (strlen(name) >= TNAMESIZE) {
         strncpy(_name + prefixLen, name, TNAMESIZE);
