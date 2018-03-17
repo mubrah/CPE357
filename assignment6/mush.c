@@ -96,7 +96,7 @@ int sigSafeScan(char *buffer, int bufferLen) {
             *_buffer = '\0';
             return i;   
         } else {
-            buffer++;
+            _buffer++;
             i++;
         }
     }
@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
     while (!feof(stdin)) {
         memset(stages, '\0', MAXCMDS * sizeof(*stages));
         printf(":-P "); 
-        cmdBufLen = sigSafeScan((char *)&cmdBuf, CLILEN);
+        cmdBufLen = sigSafeScan(&cmdBuf[0], CLILEN);
         if (cmdBufLen > CLILEN) {
             fprintf(stderr, "command too long\n");
             continue;
