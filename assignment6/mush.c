@@ -1,6 +1,7 @@
 #include "mush.h"
 
 volatile int childPID = 0;
+volatile int interrupted = 0;
 static struct sigaction sa;
 
 void pipeline(struct cmd *stages, int stageCount) {
@@ -74,14 +75,37 @@ void pipeline(struct cmd *stages, int stageCount) {
     return;
 }
 
-void catchStdinEOF(int signum) {
+void catchInt(int signum) {
     kill(childPID, SIGINT);
+    interrupted = 1;
     /* sigaction(signum, &sa, NULL); */
     return;
 }
 
+int sigSafeScan(char *buffer, int bufferLen) {
+    char *_buffer = buffer;
+    int i = 0;
+
+    while (!interrupted) {
+        *_buffer = fgetc(stdin);
+        if (i == bufferLen) {
+            return i++;
+        } else if (feof(stdin)) {
+            break;
+        } else if (*_buffer == '\n') {
+            *_buffer = '\0';
+            return i;   
+        } else {
+            buffer++;
+            i++;
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     struct cmd stages[MAXCMDS];
+    int cmdBufLen = 0;
     char cmdBuf[CLILEN] = {'\0'}; /* TODO: traling '| '*/
     char *_cmdBuf = (char *)&cmdBuf;
     char cmdBufOrig[CLILEN] = {'\0'};
@@ -94,22 +118,25 @@ int main(int argc, char **argv) {
     }
 
     memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = catchStdinEOF;
+    sa.sa_handler = catchInt;
+    sa.sa_flags = SA_RESTART;
     sigemptyset(&sa.sa_mask);
     sigaddset(&sa.sa_mask, SIGINT);
+    sigaddset(&sa.sa_mask, EINTR);
     sigaction(SIGINT, &sa, NULL);
 
     while (!feof(stdin)) {
         memset(stages, '\0', MAXCMDS * sizeof(*stages));
         printf(":-P "); 
-        scanf(" %[^\n\r]", cmdBuf);
-        if (strlen(cmdBuf) > CLILEN) {
+        cmdBufLen = sigSafeScan((char *)&cmdBuf, CLILEN);
+        if (cmdBufLen > CLILEN) {
             fprintf(stderr, "command too long\n");
             continue;
-        } else if (strlen(cmdBuf) == 0) {
+        } else if (cmdBufLen == 0) {
             if (feof(stdin)) 
                 break;
-            fprintf(stderr, "invalid null command\n");
+            if (interrupted)
+                interrupted = 0;
             continue;
         }
         strcpy(cmdBufOrig, cmdBuf);
