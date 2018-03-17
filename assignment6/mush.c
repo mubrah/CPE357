@@ -133,10 +133,13 @@ int main(int argc, char **argv) {
             fprintf(stderr, "command too long\n");
             continue;
         } else if (cmdBufLen == 0) {
-            if (feof(stdin)) 
+            if (feof(stdin))  {
+                fflush(stdout);
                 break;
-            if (interrupted)
+            }
+            if (interrupted) {
                 interrupted = 0;
+            }
             continue;
         }
         strcpy(cmdBufOrig, cmdBuf);
