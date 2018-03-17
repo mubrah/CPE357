@@ -148,6 +148,6 @@ int main(int argc, char **argv) {
         pipeline(&stages[0], stageCount);
         memset(cmdBuf, '\0', CLILEN * sizeof(*cmdBuf));
     }
-
+    kill(childPID, SIGINT);
     return 0;
 }
