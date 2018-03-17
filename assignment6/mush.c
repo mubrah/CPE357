@@ -76,17 +76,22 @@ void pipeline(struct cmd *stages, int stageCount) {
 
 void catchStdinEOF(int signum) {
     kill(childPID, SIGINT);
-    sigaction(signum, &sa, NULL);
+    /* sigaction(signum, &sa, NULL); */
     return;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
     struct cmd stages[MAXCMDS];
     char cmdBuf[CLILEN] = {'\0'}; /* TODO: traling '| '*/
     char *_cmdBuf = (char *)&cmdBuf;
     char cmdBufOrig[CLILEN] = {'\0'};
     char *_cmdBufOrig = (char *)&cmdBufOrig;
     int stageCount=0;
+
+    if (argc > 1) {
+        execvp(argv[1], &argv[1]);
+        return 0;
+    }
 
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = catchStdinEOF;
@@ -100,12 +105,12 @@ int main(void) {
         scanf(" %[^\n\r]", cmdBuf);
         if (strlen(cmdBuf) > CLILEN) {
             fprintf(stderr, "command too long\n");
-            return 1;
+            continue;
         } else if (strlen(cmdBuf) == 0) {
             if (feof(stdin)) 
                 break;
             fprintf(stderr, "invalid null command\n");
-            return 1;
+            continue;
         }
         strcpy(cmdBufOrig, cmdBuf);
         if ((stageCount = parseLine(stages, _cmdBuf, _cmdBufOrig)) < 0)

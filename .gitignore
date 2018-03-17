@@ -8,6 +8,7 @@ hdecode
 mytar
 parseline
 timeit
+mush
 
 # Prerequisites
 *.d

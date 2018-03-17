@@ -45,6 +45,6 @@
 #ifndef MUSH_H
 #define MUSH_H
 void pipeline(struct cmd *stages, int stageCount);
-int main(void);
+int main(int argc, char **argv);
 
 #endif
