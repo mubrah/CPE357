@@ -60,7 +60,7 @@ void pipeline(struct cmd *stages, int stageCount) {
             close(writePipe[0]);
             close(writePipe[1]);
             execvp(stage->argv[0], stage->argv);
-            perror("execvp() failed!");
+            fprintf(stderr, "mush: %s: %s\n", stage->argv[0], strerror(errno));
         } else {                                /* Parent */
             waitpid(childPID, &childStatus, 0);
             if (childStatus > 0)
@@ -84,14 +84,16 @@ void catchInt(int signum) {
 
 int sigSafeScan(char *buffer, int bufferLen) {
     char *_buffer = buffer;
-    int i = 0;
+    int i = 0, readSize;
 
     while (!interrupted) {
-        *_buffer = fgetc(stdin);
+        readSize = read(STDIN_FILENO, _buffer, 1);
+        if (readSize < 0)
+            break;
+        if (readSize == 0)
+            return EOF;
         if (i == bufferLen) {
             return i++;
-        } else if (feof(stdin)) {
-            break;
         } else if (*_buffer == '\n') {
             *_buffer = '\0';
             return i;   
@@ -119,28 +121,26 @@ int main(int argc, char **argv) {
 
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = catchInt;
-    sa.sa_flags = SA_RESTART;
     sigemptyset(&sa.sa_mask);
     sigaddset(&sa.sa_mask, SIGINT);
-    sigaddset(&sa.sa_mask, EINTR);
     sigaction(SIGINT, &sa, NULL);
 
-    while (!feof(stdin)) {
+    while (1) {
         memset(stages, '\0', MAXCMDS * sizeof(*stages));
         printf(":-P "); 
+        fflush(stdout);
         cmdBufLen = sigSafeScan(&cmdBuf[0], CLILEN);
         if (cmdBufLen > CLILEN) {
             fprintf(stderr, "command too long\n");
             continue;
         } else if (cmdBufLen == 0) {
-            if (feof(stdin))  {
-                fflush(stdout);
-                break;
-            }
             if (interrupted) {
                 interrupted = 0;
+                printf("\n");
             }
             continue;
+        } else if (cmdBufLen == EOF) {
+            break;
         }
         strcpy(cmdBufOrig, cmdBuf);
         if ((stageCount = parseLine(stages, _cmdBuf, _cmdBufOrig)) < 0)
